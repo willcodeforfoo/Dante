@@ -13314,29 +13314,76 @@ if ( typeof define === "function" ) {
         this.element = element;
       }
       s = new Sanitize({
-        elements: ['div', 'strong', 'em', 'br', 'a', 'span', 'blockquote', 'b', 'u', 'i', 'pre', 'p', 'h2', 'h3'],
+        elements: ['strong', 'em', 'br', 'a', 'blockquote', 'b', 'u', 'i', 'pre', 'p', 'h2', 'h3'],
         attributes: {
           '__ALL__': ['class'],
-          a: ['href', 'title']
+          a: ['href', 'title', 'target']
         },
         protocols: {
           a: {
             href: ['http', 'https', 'mailto']
           }
-        }
+        },
+        transformers: [
+          function(input) {
+            if (input.node_name === "span" && $(input.node).hasClass("defaultValue")) {
+              return {
+                whitelist_nodes: [input.node]
+              };
+            }
+          }, function(input) {
+            if (input.node_name === 'div' && $(input.node).hasClass("graf--mixtapeEmbed")) {
+              return {
+                whitelist_nodes: [input.node]
+              };
+            } else if (input.node_name === 'a' && $(input.node).parent(".graf--mixtapeEmbed")) {
+              return {
+                attr_whitelist: ["style"]
+              };
+            }
+          }, function(input) {
+            if (input.node_name === 'figure' && $(input.node).hasClass("graf--iframe")) {
+              return {
+                whitelist_nodes: [input.node]
+              };
+            } else if (input.node_name === 'div' && $(input.node).hasClass("iframeContainer") && $(input.node).parent(".graf--iframe")) {
+              return {
+                whitelist_nodes: [input.node]
+              };
+            } else if (input.node_name === 'iframe' && $(input.node).parent(".iframeContainer")) {
+              return {
+                whitelist_nodes: [input.node]
+              };
+            } else if (input.node_name === 'figcaption' && $(input.node).parent(".graf--iframe")) {
+              return {
+                whitelist_nodes: [input.node]
+              };
+            }
+          }, function(input) {
+            if (input.node_name === 'figure' && $(input.node).hasClass("graf--figure")) {
+              return {
+                whitelist_nodes: [input.node]
+              };
+            } else if (input.node_name === 'div' && ($(input.node).hasClass("aspect-ratio-fill") || $(input.node).hasClass("aspectRatioPlaceholder")) && $(input.node).parent(".graf--figure")) {
+              return {
+                whitelist_nodes: [input.node]
+              };
+            } else if (input.node_name === 'img' && $(input.node).parent(".graf--figure")) {
+              return {
+                whitelist_nodes: [input.node]
+              };
+            } else if (input.node_name === 'a' && $(input.node).parent(".graf--mixtapeEmbed")) {
+              return {
+                attr_whitelist: ["style"]
+              };
+            } else if (input.node_name === 'span' && $(input.node).parent(".imageCaption")) {
+              return {
+                whitelist_nodes: [input.node]
+              };
+            }
+          }
+        ]
       });
-
-      /*
-      transformers: [(input)->
-                      if(input.node_name == 'p')
-                        return whitelist_nodes: [input.node]
-                    ,
-                    (input)->
-                      if(input.node_name == 'pre')
-                        debugger
-                        return null
-                    ]
-       */
       utils.log("CLEAN HTML");
       if (!_.isEmpty(this.element)) {
         return this.element.html(s.clean_node(this.element[0]));
