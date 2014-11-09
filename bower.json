@@ -1,0 +1,11 @@
+{
+  "name" : "dante",
+  "version" : "0.0.1",
+  "main" : "dante.js",
+  "dependencies" : {
+    "jquery": "*",
+    "underscore" : "*",
+    "backbone" : "*",
+    "sanitize.js" : "*",
+  }
+}
