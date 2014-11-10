@@ -41,6 +41,10 @@
     return dataURL;
   };
 
+  utils.generateUniqueName = function() {
+    return Math.random().toString(36).slice(8);
+  };
+
   Editor.MainEditor = (function(_super) {
     __extends(MainEditor, _super);
 
@@ -115,7 +119,7 @@
     };
 
     MainEditor.prototype.baseParagraphTmpl = function() {
-      return "<p class='graf--p' name='" + (this.generateUniqueName()) + "'><br></p>";
+      return "<p class='graf--p' name='" + (utils.generateUniqueName()) + "'><br></p>";
     };
 
     MainEditor.prototype.appendMenus = function() {
@@ -992,11 +996,7 @@
     };
 
     MainEditor.prototype.setElementName = function(element) {
-      return $(element).attr("name", this.generateUniqueName());
-    };
-
-    MainEditor.prototype.generateUniqueName = function(element) {
-      return Math.random().toString(36).slice(8);
+      return $(element).attr("name", utils.generateUniqueName());
     };
 
     return MainEditor;
@@ -1232,7 +1232,7 @@
     };
 
     Tooltip.prototype.insertTemplate = function() {
-      return "<figure contenteditable='false' class='graf graf--figure is-defaultValue' name='' tabindex='0'> <div style='' class='aspectRatioPlaceholder is-locked'> <div style='padding-bottom: 62.5%;' class='aspect-ratio-fill'></div> <img src='' data-height='375' data-width='600' data-image-id='' class='graf-image' data-delayed-src=''> </div> <figcaption contenteditable='true' data-default-value='Type caption for image (optional)' class='imageCaption'> <span class='defaultValue'>Type caption for image (optional)</span> <br> </figcaption> </figure>";
+      return "<figure contenteditable='false' class='graf graf--figure is-defaultValue' name='" + (utils.generateUniqueName()) + "' tabindex='0'> <div style='max-width: 600px; max-height: 375px;' class='aspectRatioPlaceholder is-locked'> <div style='padding-bottom: 62.5%;' class='aspect-ratio-fill'></div> <img src='' data-height='375' data-width='600' data-image-id='' class='graf-image' data-delayed-src=''> </div> <figcaption contenteditable='true' data-default-value='Type caption for image (optional)' class='imageCaption'> <span class='defaultValue'>Type caption for image (optional)</span> <br> </figcaption> </figure>";
     };
 
     Tooltip.prototype.extractTemplate = function() {
@@ -1316,24 +1316,28 @@
     };
 
     Tooltip.prototype.displayCachedImage = function(file) {
-      var new_node, reader, replaced_node;
+      var reader;
       this.node = current_editor.getNode();
-      new_node = $(this.insertTemplate()).attr("name", $(this.node).attr("name"));
-      replaced_node = $(this.node).replaceWith(new_node);
       current_editor.tooltip_view.hide();
       reader = new FileReader();
-      reader.onload = function(e) {
-        var i, img_tag;
-        i = new Image;
-        i.src = e.target.result;
-        img_tag = $('img.graf-image').attr('src', e.target.result);
-        img_tag.height = i.height;
-        img_tag.width = i.width;
-        return $('img.graf-image').parent(".aspectRatioPlaceholder").css({
-          'max-width': i.width,
-          'max-height': i.height
-        });
-      };
+      reader.onload = (function(_this) {
+        return function(e) {
+          var i, img_tag, new_tmpl, replaced_node;
+          i = new Image;
+          i.src = e.target.result;
+          new_tmpl = $(_this.insertTemplate());
+          replaced_node = $(new_tmpl).insertBefore($(_this.node));
+          img_tag = new_tmpl.find('img.graf-image').attr('src', e.target.result);
+          img_tag.height = i.height;
+          img_tag.width = i.width;
+          if (!(i.width === 0 || i.height === 0)) {
+            return $('img.graf-image').parent(".aspectRatioPlaceholder").css({
+              'max-width': i.width,
+              'max-height': i.height
+            });
+          }
+        };
+      })(this);
       return reader.readAsDataURL(file);
     };
 
