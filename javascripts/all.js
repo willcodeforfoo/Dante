@@ -13708,7 +13708,7 @@ if ( typeof define === "function" ) {
     };
 
     Tooltip.prototype.insertTemplate = function() {
-      return "<figure contenteditable='false' class='graf graf--figure is-defaultValue' name='' tabindex='0'> <div style='max-width: 600px; max-height: 375px;' class='aspectRatioPlaceholder is-locked'> <div style='padding-bottom: 62.5%;' class='aspect-ratio-fill'></div> <img src='' data-height='375' data-width='600' data-image-id='' class='graf-image' data-delayed-src=''> </div> <figcaption contenteditable='true' data-default-value='Type caption for image (optional)' class='imageCaption'> <span class='defaultValue'>Type caption for image (optional)</span> <br> </figcaption> </figure>";
+      return "<figure contenteditable='false' class='graf graf--figure is-defaultValue' name='' tabindex='0'> <div style='' class='aspectRatioPlaceholder is-locked'> <div style='padding-bottom: 62.5%;' class='aspect-ratio-fill'></div> <img src='' data-height='375' data-width='600' data-image-id='' class='graf-image' data-delayed-src=''> </div> <figcaption contenteditable='true' data-default-value='Type caption for image (optional)' class='imageCaption'> <span class='defaultValue'>Type caption for image (optional)</span> <br> </figcaption> </figure>";
     };
 
     Tooltip.prototype.extractTemplate = function() {
@@ -13725,7 +13725,7 @@ if ( typeof define === "function" ) {
     };
 
     Tooltip.prototype.toggleOptions = function() {
-      utils.log("OLI!!");
+      utils.log("Toggle Options!!");
       return $(this.el).toggleClass("is-active is-scaled");
     };
 
@@ -13792,9 +13792,10 @@ if ( typeof define === "function" ) {
     };
 
     Tooltip.prototype.displayCachedImage = function(file) {
-      var reader, replaced_node;
+      var new_node, reader, replaced_node;
       this.node = current_editor.getNode();
-      replaced_node = $(this.node).replaceWith(this.insertTemplate());
+      new_node = $(this.insertTemplate()).attr("name", $(this.node).attr("name"));
+      replaced_node = $(this.node).replaceWith(new_node);
       current_editor.tooltip_view.hide();
       reader = new FileReader();
       reader.onload = function(e) {
