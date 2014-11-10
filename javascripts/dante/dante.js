@@ -30,6 +30,17 @@
     }
   };
 
+  utils.getBase64Image = function(img) {
+    var canvas, ctx, dataURL;
+    canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+    dataURL = canvas.toDataURL("image/png");
+    return dataURL;
+  };
+
   Editor.MainEditor = (function(_super) {
     __extends(MainEditor, _super);
 
@@ -506,6 +517,7 @@
             top = new_node.offset().top;
             _this.markAsSelected(new_node);
             _this.displayTooltipAt($(_this.el).find(".is-selected"));
+            _this.handleUnwrappedImages(nodes);
             return $('html, body').animate({
               scrollTop: top
             }, 200);
@@ -513,6 +525,15 @@
         })(this));
         return false;
       }
+    };
+
+    MainEditor.prototype.handleUnwrappedImages = function(elements) {
+      return _.each(elements.find("img"), (function(_this) {
+        return function(image) {
+          utils.log("process image here!");
+          return _this.tooltip_view.uploadExistentImage(image);
+        };
+      })(this));
     };
 
     MainEditor.prototype.handleInmediateDeletion = function(element) {
@@ -794,6 +815,7 @@
           break;
         case "img":
           utils.log("images");
+          this.tooltip_view.uploadExistentImage(n);
           break;
         case "a":
           $(n).wrap("<p class='graf graf--" + name + "'></p>");
@@ -854,6 +876,8 @@
               return {
                 whitelist_nodes: [input.node]
               };
+            } else {
+              return null;
             }
           }, function(input) {
             if (input.node_name === 'div' && $(input.node).hasClass("graf--mixtapeEmbed")) {
@@ -864,6 +888,8 @@
               return {
                 attr_whitelist: ["style"]
               };
+            } else {
+              return null;
             }
           }, function(input) {
             if (input.node_name === 'figure' && $(input.node).hasClass("graf--iframe")) {
@@ -882,6 +908,8 @@
               return {
                 whitelist_nodes: [input.node]
               };
+            } else {
+              return null;
             }
           }, function(input) {
             if (input.node_name === 'figure' && $(input.node).hasClass("graf--figure")) {
@@ -904,12 +932,14 @@
               return {
                 whitelist_nodes: [input.node]
               };
+            } else {
+              return null;
             }
           }
         ]
       });
-      utils.log("CLEAN HTML");
       if (!_.isEmpty(this.element)) {
+        utils.log("CLEAN HTML");
         return this.element.html(s.clean_node(this.element[0]));
       }
     };
@@ -927,12 +957,18 @@
     MainEditor.prototype.preCleanNode = function(element) {
       var s;
       s = new Sanitize({
-        elements: ['a', 'b', 'u', 'i', 'pre', 'blockquote'],
+        elements: ['strong', 'em', 'br', 'a', 'b', 'u', 'i'],
         attributes: {
-          a: ['href', 'title']
+          a: ['href', 'title', 'target']
+        },
+        protocols: {
+          a: {
+            href: ['http', 'https', 'mailto']
+          }
         }
       });
-      $(element).html(s.clean_node($($(element).html())[0]));
+      $(element).html(s.clean_node(element[0]));
+      element = this.addClassesToElement($(element)[0]);
       return $(element);
     };
 
@@ -1238,6 +1274,36 @@
       }
     };
 
+    Tooltip.prototype.uploadExistentImage = function(image_element, opts) {
+      var node, tmpl, tmpl_img;
+      if (opts == null) {
+        opts = {};
+      }
+      utils.log("process image here!");
+      tmpl = $(this.insertTemplate());
+      tmpl_img = tmpl.find("img").attr('src', image_element.src);
+      tmpl.find(".aspectRatioPlaceholder").css({
+        'max-width': image_element.width,
+        'max-height': image_element.height
+      });
+      if ($(image_element).parents(".graf").length > 0) {
+        if ($(image_element).parents(".graf").hasClass("graf--figure")) {
+          return;
+        }
+        tmpl.insertBefore($(image_element).parents(".graf"));
+        node = current_editor.getNode();
+        current_editor.preCleanNode($(node));
+        return current_editor.addClassesToElement(node);
+      } else {
+        return $(image_element).replaceWith(tmpl);
+      }
+    };
+
+    Tooltip.prototype.displayAndUploadImages = function(file) {
+      this.displayCachedImage(file);
+      return this.uploadFile(file);
+    };
+
     Tooltip.prototype.imageSelect = function(ev) {
       var $selectFile, self;
       $selectFile = $('<input type="file" multiple="multiple">').click();
@@ -1256,7 +1322,16 @@
       current_editor.tooltip_view.hide();
       reader = new FileReader();
       reader.onload = function(e) {
-        return $('img.graf-image').attr('src', e.target.result);
+        var i, img_tag;
+        i = new Image;
+        i.src = e.target.result;
+        img_tag = $('img.graf-image').attr('src', e.target.result);
+        img_tag.height = i.height;
+        img_tag.width = i.width;
+        return $('img.graf-image').parent(".aspectRatioPlaceholder").css({
+          'max-width': i.width,
+          'max-height': i.height
+        });
       };
       return reader.readAsDataURL(file);
     };
@@ -1281,8 +1356,7 @@
         file = files[i];
         if (acceptedTypes[file.type] === true) {
           $(this.placeholder).append("<progress class=\"progress\" min=\"0\" max=\"100\" value=\"0\">0</progress>");
-          this.displayCachedImage(file);
-          this.uploadFile(file);
+          this.displayAndUploadImages(file);
         }
         _results.push(i++);
       }
