@@ -13307,6 +13307,10 @@ if ( typeof define === "function" ) {
           break;
         case "blockquote":
           n = $(n).removeClass().addClass("graf graf--" + name);
+          break;
+        default:
+          $(n).wrap("<p class='graf graf--" + name + "'></p>");
+          n = $(n).parent();
       }
       return n;
     };
