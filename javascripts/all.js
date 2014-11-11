@@ -12532,7 +12532,6 @@ if ( typeof define === "function" ) {
       this.handleArrow = __bind(this.handleArrow, this);
       this.handleMouseUp = __bind(this.handleMouseUp, this);
       this.handleBlur = __bind(this.handleBlur, this);
-      this.handleFocus = __bind(this.handleFocus, this);
       this.selection = __bind(this.selection, this);
       this.render = __bind(this.render, this);
       this.restart = __bind(this.restart, this);
@@ -12550,8 +12549,7 @@ if ( typeof define === "function" ) {
       "keydown": "handleKeyDown",
       "keyup": "handleKeyUp",
       "paste": "handlePaste",
-      "destroyed .graf--first": "handleDeletedContainer",
-      "focus .graf": "handleFocus"
+      "click .graf--figure": "handleGrafFigureSelect"
     };
 
     MainEditor.prototype.initialize = function(opts) {
@@ -12846,9 +12844,11 @@ if ( typeof define === "function" ) {
       return $(".graf--last").html(this.body_placeholder);
     };
 
-    MainEditor.prototype.handleFocus = function(ev) {
-      this.markAsSelected(ev.currentTarget);
-      return this.displayTooltipAt(ev.currentTarget);
+    MainEditor.prototype.handleGrafFigureSelect = function(ev) {
+      var element;
+      element = ev.currentTarget;
+      this.markAsSelected(element);
+      return this.setRangeAt($(element).find('.imageCaption')[0]);
     };
 
     MainEditor.prototype.handleBlur = function(ev) {
@@ -12866,8 +12866,12 @@ if ( typeof define === "function" ) {
       var anchor_node;
       utils.log("MOUSE UP");
       anchor_node = this.getNode();
-      this.handleTextSelection(anchor_node);
       utils.log(anchor_node);
+      utils.log(ev.currentTarget);
+      if (_.isNull(anchor_node)) {
+        return;
+      }
+      this.handleTextSelection(anchor_node);
       this.hidePlaceholder(anchor_node);
       this.markAsSelected(anchor_node);
       return this.displayTooltipAt(anchor_node);
@@ -12981,7 +12985,7 @@ if ( typeof define === "function" ) {
         pastedText = _.isEmpty(cbd.getData('text/html')) ? cbd.getData('text/plain') : cbd.getData('text/html');
       }
       if (pastedText.match(/<\/*[a-z][^>]+?>/gi)) {
-        console.log("HTML DETECTED ON PASTE");
+        utils.log("HTML DETECTED ON PASTE");
         $(pastedText);
         document.body.appendChild($("<div id='paste'></div>")[0]);
         $("#paste").html(pastedText);
