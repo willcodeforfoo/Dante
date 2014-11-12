@@ -28,7 +28,7 @@
 
 /*MENU*/
 /* line 32, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
-.editor-menu {
+.dante-menu {
   background: linear-gradient(to bottom, #222, #333) repeat scroll 0 0 #333;
   border: 1px solid #333;
   border-radius: 3px;
@@ -44,34 +44,47 @@
   -moz-transition: opacity 0.2s ease-in-out;
   transition: opacity 0.2s ease-in-out; }
   /* line 49, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
-  .editor-menu:after {
-    left: 50%; }
-  /* line 52, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
-  .editor-menu:after {
+  .dante-menu:after {
+    border-left: 6px solid transparent;
+    border-right: 9px solid transparent;
+    border-top: 7px solid #333;
     border-color: #333 rgba(51, 51, 51, 0) rgba(51, 51, 51, 0);
-    border-width: 6px;
-    left: 50%;
-    margin-left: -6px;
-    border: medium solid transparent;
     content: " ";
     height: 0;
-    pointer-events: none;
+    left: 50%;
+    margin-left: -6px;
     position: absolute;
-    top: 100%;
-    width: 0; }
+    top: 99%;
+    width: 0;
+    pointer-events: none; }
 
-/* line 68, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
-.editor-menu, .editor-input {
-  font-size: 14px;
-  line-height: 1; }
-
-/* line 73, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
-.pen, .editor-menu, .editor-input, .pen textarea {
+/* line 67, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+.dante-menu, .dante-input {
   color: #331;
   font: 400 1.16em/1.45 Palatino,Optima,Georgia,serif; }
 
-/* line 78, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
-.editor-menu [class^="icon-"]:before, .editor-menu [class*=" icon-"]:before {
+/* line 72, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+.dante-input {
+  background: none repeat scroll 0 0 #333;
+  border: medium none;
+  color: #fff;
+  display: none;
+  font-family: arial,sans-serif;
+  height: 36px;
+  left: 0;
+  line-height: 20px;
+  position: absolute;
+  text-align: center;
+  top: 0;
+  width: 100%; }
+
+/* line 87, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+.dante-menu, .dante-input {
+  font-size: 14px;
+  line-height: 1; }
+
+/* line 92, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+.dante-menu [class^="icon-"]:before, .dante-menu [class*=" icon-"]:before {
   display: inline-block;
   font-family: "dante";
   font-style: normal;
@@ -85,17 +98,17 @@
   text-transform: none;
   width: 1em; }
 
-/* line 93, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
-.editor-icon:first-of-type {
+/* line 107, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+.dante-icon:first-of-type {
   border-bottom-left-radius: 3px;
   border-top-left-radius: 3px; }
 
-/* line 98, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
-.editor-menu [class^="icon-"], .editor-menu [class*=" icon-"] {
+/* line 112, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+.dante-menu [class^="icon-"], .dante-menu [class*=" icon-"] {
   background: none repeat scroll 0 0 transparent; }
 
-/* line 102, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
-.editor-icon {
+/* line 116, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+.dante-icon {
   -moz-user-select: none;
   color: #fff;
   cursor: pointer;
@@ -106,57 +119,57 @@
   overflow: hidden;
   padding: 0 10px;
   text-align: center; }
-  /* line 114, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
-  .editor-icon.icon-h2:before {
+  /* line 128, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+  .dante-icon.icon-h2:before {
     content: "H2"; }
-  /* line 117, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
-  .editor-icon.icon-h3:before {
+  /* line 131, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+  .dante-icon.icon-h3:before {
     content: "H3"; }
-  /* line 120, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
-  .editor-icon.icon-p:before {
+  /* line 134, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+  .dante-icon.icon-p:before {
     content: "P"; }
-  /* line 123, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
-  .editor-icon.icon-code:before {
+  /* line 137, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+  .dante-icon.icon-code:before {
     content: ""; }
-  /* line 126, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
-  .editor-icon.icon-insertorderedlist:before {
+  /* line 140, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+  .dante-icon.icon-insertorderedlist:before {
     content: ""; }
-  /* line 129, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
-  .editor-icon.icon-insertunorderedlist:before {
+  /* line 143, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+  .dante-icon.icon-insertunorderedlist:before {
     content: ""; }
-  /* line 132, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
-  .editor-icon.icon-inserthorizontalrule:before {
+  /* line 146, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+  .dante-icon.icon-inserthorizontalrule:before {
     content: ""; }
-  /* line 135, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
-  .editor-icon.icon-indent:before {
+  /* line 149, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+  .dante-icon.icon-indent:before {
     content: ""; }
-  /* line 138, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
-  .editor-icon.icon-outdent:before {
+  /* line 152, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+  .dante-icon.icon-outdent:before {
     content: ""; }
-  /* line 141, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
-  .editor-icon.icon-bold:before {
+  /* line 155, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+  .dante-icon.icon-bold:before {
     content: ""; }
-  /* line 144, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
-  .editor-icon.icon-italic:before {
+  /* line 158, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+  .dante-icon.icon-italic:before {
     content: ""; }
-  /* line 147, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
-  .editor-icon.icon-underline:before {
+  /* line 161, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+  .dante-icon.icon-underline:before {
     content: ""; }
-  /* line 150, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
-  .editor-icon.icon-createlink:before {
+  /* line 164, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+  .dante-icon.icon-createlink:before {
     content: ""; }
-  /* line 154, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
-  .editor-icon.icon-blockquote:before {
+  /* line 168, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+  .dante-icon.icon-blockquote:before {
     content: ""; }
 
 /*TOOLTIP*/
-/* line 160, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 174, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .inlineTooltip2.is-active {
   opacity: 1;
   pointer-events: auto;
   width: auto !important; }
 
-/* line 166, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 180, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .notesSource .inlineTooltip2 {
   height: 40px;
   margin-left: -58px;
@@ -167,39 +180,39 @@
   width: 40px;
   z-index: 900; }
 
-/* line 179, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 193, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .button--small.button--circle {
   height: 32px;
   padding: 0;
   width: 32px; }
 
-/* line 184, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 198, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .button--inlineTooltipControl {
   transform: rotate(0deg);
   transition: transform 0.1s ease 0s; }
 
-/* line 188, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 202, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .button--small, .button--small.button--link, .button--small.button--chromeless {
   font-size: 12px; }
 
-/* line 192, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 206, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .button--small {
   height: 32px;
   line-height: 31px;
   padding: 0 14px; }
 
-/* line 198, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 212, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .button--neutral {
   border-color: rgba(0, 0, 0, 0.44);
   color: rgba(0, 0, 0, 0.44); }
 
-/* line 203, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 217, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .button--circle {
   padding: 0;
   text-align: center;
   width: 38px; }
 
-/* line 209, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 223, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .button {
   -moz-osx-font-smoothing: grayscale;
   -moz-user-select: none;
@@ -227,24 +240,24 @@
   vertical-align: bottom;
   white-space: nowrap; }
 
-/* line 237, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 251, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 button, html input[type="button"], input[type="reset"], input[type="submit"] {
   cursor: pointer; }
 
-/* line 241, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 255, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .button-scalableGroup .icon.icon--addMediaPlus:before, .button-scalableGroup .icon.icon--addMediaImage:before, .button-scalableGroup .icon.icon--addMediaVideo:before, .button-scalableGroup .icon.icon--addMediaEmbed:before, .button-scalableGroup .icon.icon--addMediaPart:before {
   font-size: 39px;
   top: 13px; }
 
-/* line 246, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 260, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .button--neutral > .icon:before {
   color: rgba(0, 0, 0, 0.44); }
 
-/* line 250, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 264, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .button .icon.is-pulledRight:before, .button--circle .icon:before, .button--expandable .icon:before {
   margin-right: 0; }
 
-/* line 254, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 268, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .button .icon:before {
   color: rgba(0, 0, 0, 0.3);
   font-size: 20px;
@@ -253,19 +266,19 @@ button, html input[type="button"], input[type="reset"], input[type="submit"] {
   position: relative;
   top: 1px; }
 
-/* line 263, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 277, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .icon--addMediaPlus:before {
   content: ""; }
 
-/* line 266, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 280, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .button--small .icon {
   font-size: 18px; }
 
-/* line 269, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 283, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .button .icon {
   line-height: 100%; }
 
-/* line 273, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 287, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .icon {
   -moz-osx-font-smoothing: grayscale;
   font-family: "medium-icons";
@@ -275,7 +288,7 @@ button, html input[type="button"], input[type="reset"], input[type="submit"] {
   text-rendering: optimizelegibility;
   text-transform: none; }
 
-/* line 283, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 297, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .inlineTooltip2.is-scaled > .button--inlineTooltipControl {
   -webkit-transition: -webkit-transform .25s;
   transition: transform .25s;
@@ -283,20 +296,20 @@ button, html input[type="button"], input[type="reset"], input[type="submit"] {
   -ms-transform: rotate(45deg);
   transform: rotate(45deg); }
 
-/* line 291, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 305, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .inlineTooltip2-menu {
   display: inline-block;
   padding-left: 22px; }
 
-/* line 296, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 310, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .inlineTooltip2.is-active {
   pointer-events: auto; }
 
-/* line 300, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 314, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .inlineTooltip2-menu .button {
   margin-right: 9px; }
 
-/* line 304, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 318, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .button-scalableGroup.is-scaled .button--scale {
   -webkit-transform: scale(1);
   -ms-transform: scale(1);
@@ -304,7 +317,7 @@ button, html input[type="button"], input[type="reset"], input[type="submit"] {
   -webkit-transition-duration: 200ms;
   transition-duration: 200ms; }
 
-/* line 312, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 326, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .button--scale {
   -webkit-transform: scale(0);
   -ms-transform: scale(0);
@@ -314,22 +327,22 @@ button, html input[type="button"], input[type="reset"], input[type="submit"] {
   -webkit-transition-duration: 100ms;
   transition-duration: 100ms; }
 
-/* line 322, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 336, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .u-transitionSeries:nth-child(2) {
   -webkit-transition-delay: 30ms;
   transition-delay: 30ms; }
 
-/* line 327, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 341, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .graf--p, .graf--blockquote, .graf--pullquote {
   margin-bottom: 30px; }
 
-/* line 335, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 349, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .debug .section-inner .is-selected {
   outline-color: #55b6b3;
   outline-width: thin;
   outline-style: dotted; }
 
-/* line 345, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 359, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .graf--h2 {
   font-family: "jaf-bernino-sans", "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
   font-size: 60px;
@@ -342,7 +355,7 @@ button, html input[type="button"], input[type="reset"], input[type="submit"] {
   margin-top: 40px;
   padding-top: 0; }
 
-/* line 358, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 372, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .graf--h4 {
   color: rgba(0, 0, 0, 0.44);
   font-family: "jaf-bernino-sans", "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
@@ -355,11 +368,11 @@ button, html input[type="button"], input[type="reset"], input[type="submit"] {
   margin-left: -1.5px;
   margin-top: 40px; }
 
-/* line 371, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 385, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .graf--pre + .graf--pre {
   margin-top: -20px; }
 
-/* line 375, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 389, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .graf--pre {
   background: none repeat scroll 0 0 rgba(0, 0, 0, 0.05);
   font-family: Monaco,"Courier New","Courier",monospace;
@@ -368,12 +381,12 @@ button, html input[type="button"], input[type="reset"], input[type="submit"] {
   padding: 20px;
   white-space: pre-wrap; }
 
-/* line 384, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 398, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .graf--blockquote + .graf--blockquote {
   margin-top: -30px;
   padding-top: 30px; }
 
-/* line 389, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 403, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .graf--blockquote {
   border-left: 3px solid rgba(0, 0, 0, 0.8);
   font-family: "freight-text-pro", "Merriweather", Georgia, Cambria, "Times New Roman", Times, serif;
@@ -384,15 +397,15 @@ button, html input[type="button"], input[type="reset"], input[type="submit"] {
   padding-bottom: 3px;
   padding-left: 20px; }
 
-/* line 400, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 414, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .graf--p, .graf--blockquote, .graf--pullquote {
   margin-bottom: 30px; }
 
-/* line 404, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 418, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .markup--anchor, .graf--sectionCaption {
   cursor: text; }
 
-/* line 408, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 422, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .markup--anchor {
   background-image: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.6) 50%);
   background-position: 0 24px;
@@ -401,7 +414,7 @@ button, html input[type="button"], input[type="reset"], input[type="submit"] {
   text-decoration: none;
   color: black; }
 
-/* line 417, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 431, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .graf--pre {
   background: none repeat scroll 0 0 rgba(0, 0, 0, 0.05);
   font-family: Monaco,"Courier New","Courier",monospace;
@@ -410,7 +423,7 @@ button, html input[type="button"], input[type="reset"], input[type="submit"] {
   padding: 20px;
   white-space: pre-wrap; }
 
-/* line 426, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 440, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .graf--figure {
   box-sizing: border-box;
   clear: both;
@@ -418,13 +431,13 @@ button, html input[type="button"], input[type="reset"], input[type="submit"] {
   outline: medium none;
   position: relative; }
 
-/* line 434, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 448, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .aspectRatioPlaceholder {
   margin: 0 auto;
   position: relative;
   width: 100%; }
 
-/* line 440, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 454, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .is-postEditMode .graf-image:before, .is-postEditMode .iframeContainer:before {
   bottom: 0;
   content: "";
@@ -434,11 +447,11 @@ button, html input[type="button"], input[type="reset"], input[type="submit"] {
   top: 0;
   z-index: 500; }
 
-/* line 450, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 464, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .graf--figure.is-mediaFocused .graf-image {
   box-shadow: 0 0 0 3px #57ad68; }
 
-/* line 454, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 468, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .aspectRatioPlaceholder.is-locked .graf-image, .aspectRatioPlaceholder.is-locked .graf-imageAnchor {
   height: 100%;
   left: 0;
@@ -446,18 +459,18 @@ button, html input[type="button"], input[type="reset"], input[type="submit"] {
   top: 0;
   width: 100%; }
 
-/* line 462, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 476, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .graf-image, .graf-imageAnchor, .iframeContainer > iframe, .iframeContainer {
   box-sizing: border-box;
   display: block;
   margin: auto;
   max-width: 100%; }
 
-/* line 469, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 483, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .is-postEditMode iframe {
   border: 3px solid rgba(255, 255, 255, 0); }
 
-/* line 473, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 487, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .graf--mixtapeEmbed {
   border-color: rgba(0, 0, 0, 0.15);
   border-radius: 5px;
@@ -478,7 +491,7 @@ button, html input[type="button"], input[type="reset"], input[type="submit"] {
   padding: 30px;
   position: relative; }
 
-/* line 494, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 508, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .mixtapeImage {
   background-position: center center;
   background-repeat: no-repeat;
@@ -488,12 +501,12 @@ button, html input[type="button"], input[type="reset"], input[type="submit"] {
   margin: -30px -30px 0 25px;
   width: 310px; }
 
-/* line 504, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 518, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .mixtapeImage--empty {
   height: 0;
   width: 0; }
 
-/* line 509, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 523, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .graf--mixtapeEmbed {
   color: rgba(0, 0, 0, 0.6);
   font-family: "jaf-bernino-sans", "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
@@ -502,7 +515,7 @@ button, html input[type="button"], input[type="reset"], input[type="submit"] {
   font-weight: 300;
   letter-spacing: -0.02em; }
 
-/* line 518, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 532, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .markup--mixtapeEmbed-strong {
   color: #000;
   display: block;
@@ -514,7 +527,7 @@ button, html input[type="button"], input[type="reset"], input[type="submit"] {
   line-height: 1.2;
   margin-bottom: -14px; }
 
-/* line 530, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 544, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .markup--mixtapeEmbed-em {
   display: block;
   font-size: 16px;
@@ -524,7 +537,7 @@ button, html input[type="button"], input[type="reset"], input[type="submit"] {
   overflow: hidden; }
 
 /*CAPTION*/
-/* line 541, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 555, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .imageCaption:before {
   border-top: 1px solid rgba(0, 0, 0, 0.15);
   content: "";
@@ -533,7 +546,7 @@ button, html input[type="button"], input[type="reset"], input[type="submit"] {
   margin-left: 75%;
   width: 25%; }
 
-/* line 550, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 564, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .imageCaption {
   color: rgba(0, 0, 0, 0.6);
   font-family: "freight-text-pro", "Merriweather", Georgia, Cambria, "Times New Roman", Times, serif;
@@ -551,42 +564,42 @@ button, html input[type="button"], input[type="reset"], input[type="submit"] {
   width: 150px;
   z-index: 300; }
 
-/* line 568, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 582, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .graf--figure.is-mediaFocused .imageCaption, .graf--figure.is-defaultValue.is-selected .imageCaption, section.is-mediaFocused .graf--sectionCaption, .graf--sectionCaption.is-defaultValue.is-selected {
   display: block; }
 
-/* line 572, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 586, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 figure.is-defaultValue .imageCaption, .graf--sectionCaption.is-defaultValue {
   display: none; }
 
-/* line 576, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 590, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .section-content:before, .section-content:after {
   content: " ";
   display: table; }
 
-/* line 582, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 596, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .editor a a {
   color: inherit;
   text-decoration: none; }
 
-/* line 588, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 602, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .defaultValue {
   color: rgba(0, 0, 0, 0.3); }
 
-/* line 592, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 606, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 section:first-child > .section-divider, section.is-backgrounded + section > .section-divider {
   display: none; }
 
-/* line 595, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 609, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .postArticle .layoutSingleColumn, .postFooter--loggedOut .layoutSingleColumn {
   width: 700px; }
 
-/* line 599, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 613, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .layoutSingleColumn {
   margin: 0 auto;
   width: 640px; }
 
-/* line 604, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
+/* line 618, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .defaultValue--prompt {
   font-family: "jaf-bernino-sans", "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
   font-size: 18px;

@@ -12521,6 +12521,48 @@ if ( typeof define === "function" ) {
     return Math.random().toString(36).slice(8);
   };
 
+  utils.saveSelection = function() {
+    var i, len, ranges, sel;
+    if (window.getSelection) {
+      sel = window.getSelection();
+      if (sel.getRangeAt && sel.rangeCount) {
+        ranges = [];
+        i = 0;
+        len = sel.rangeCount;
+        while (i < len) {
+          ranges.push(sel.getRangeAt(i));
+          ++i;
+        }
+        return ranges;
+      }
+    } else {
+      if (document.selection && document.selection.createRange) {
+        return document.selection.createRange();
+      }
+    }
+    return null;
+  };
+
+  utils.restoreSelection = function(savedSel) {
+    var i, len, sel;
+    if (savedSel) {
+      if (window.getSelection) {
+        sel = window.getSelection();
+        sel.removeAllRanges();
+        i = 0;
+        len = savedSel.length;
+        while (i < len) {
+          sel.addRange(savedSel[i]);
+          ++i;
+        }
+      } else {
+        if (document.selection && savedSel.select) {
+          savedSel.select();
+        }
+      }
+    }
+  };
+
   Editor.MainEditor = (function(_super) {
     __extends(MainEditor, _super);
 
@@ -12597,7 +12639,7 @@ if ( typeof define === "function" ) {
     };
 
     MainEditor.prototype.appendMenus = function() {
-      $("<div id='editor-menu' class='editor-menu' style='opacity: 0;'></div>").insertAfter(this.el);
+      $("<div id='dante-menu' class='dante-menu' style='opacity: 0;'></div>").insertAfter(this.el);
       $("<div class='inlineTooltip2 button-scalableGroup'></div>").insertAfter(this.el);
       this.editor_menu = new Editor.Menu();
       this.tooltip_view = new Editor.Tooltip();
@@ -12657,6 +12699,7 @@ if ( typeof define === "function" ) {
       if (!range) {
         range = document.createRange();
       }
+      debugger;
       if (!editor.contains(range.commonAncestorContainer)) {
         range.selectNodeContents(editor);
         range.collapse(false);
@@ -12818,7 +12861,6 @@ if ( typeof define === "function" ) {
       this.editor_menu.hide();
       text = this.getSelectedText();
       if (!_.isEmpty(text.trim())) {
-        this.current_range = this.getRange();
         this.current_node = anchor_node;
         return this.displayMenu();
       }
@@ -13302,6 +13344,7 @@ if ( typeof define === "function" ) {
           this.tooltip_view.uploadExistentImage(n);
           break;
         case "a":
+          utils.log("links");
           $(n).wrap("<p class='graf graf--" + name + "'></p>");
           n = $(n).parent();
           break;
@@ -13433,13 +13476,19 @@ if ( typeof define === "function" ) {
     };
 
     MainEditor.prototype.setupLinks = function(elems) {
-      return _.each(elems, function(n) {
-        var href, parent_name;
-        parent_name = $(n).parent().prop("tagName").toLowerCase();
-        $(n).addClass("markup--anchor markup--" + parent_name + "-anchor");
-        href = $(n).attr("href");
-        return $(n).attr("data-href", href);
-      });
+      return _.each(elems, (function(_this) {
+        return function(n) {
+          return _this.setupLink(n);
+        };
+      })(this));
+    };
+
+    MainEditor.prototype.setupLink = function(n) {
+      var href, parent_name;
+      parent_name = $(n).parent().prop("tagName").toLowerCase();
+      $(n).addClass("markup--anchor markup--" + parent_name + "-anchor");
+      href = $(n).attr("href");
+      return $(n).attr("data-href", href);
     };
 
     MainEditor.prototype.preCleanNode = function(element) {
@@ -13491,18 +13540,21 @@ if ( typeof define === "function" ) {
     __extends(Menu, _super);
 
     function Menu() {
+      this.createlink = __bind(this.createlink, this);
+      this.handleInputEnter = __bind(this.handleInputEnter, this);
       this.render = __bind(this.render, this);
       this.template = __bind(this.template, this);
       this.initialize = __bind(this.initialize, this);
       return Menu.__super__.constructor.apply(this, arguments);
     }
 
-    Menu.prototype.el = "#editor-menu";
+    Menu.prototype.el = "#dante-menu";
 
     Menu.prototype.events = {
       "mousedown i": "handleClick",
       "mouseenter": "handleOver",
-      "mouseleave": "handleOut"
+      "mouseleave": "handleOut",
+      "keypress input": "handleInputEnter"
     };
 
     Menu.prototype.initialize = function(opts) {
@@ -13518,7 +13570,12 @@ if ( typeof define === "function" ) {
         wrap: /^(?:code)$/
       };
       this.lineBreakReg = /^(?:blockquote|pre|div)$/i;
-      return this.effectNodeReg = /(?:[pubia]|h[1-6]|blockquote|[uo]l|li)/i;
+      this.effectNodeReg = /(?:[pubia]|h[1-6]|blockquote|[uo]l|li)/i;
+      return this.strReg = {
+        whiteSpace: /(^\s+)|(\s+$)/g,
+        mailTo: /^(?!mailto:|.+\/|.+#|.+\?)(.*@.*\..+)$/,
+        http: /^(?!\w+?:\/\/|mailto:|\/|\.\/|\?|#)(.*)$/
+      };
     };
 
     Menu.prototype.default_config = function() {
@@ -13536,9 +13593,9 @@ if ( typeof define === "function" ) {
 
     Menu.prototype.template = function() {
       var html;
-      html = "";
+      html = "<input class='dante-input' placeholder='http://' style='display: none;'>";
       _.each(this.config.buttons, function(item) {
-        return html += "<i class=\"editor-icon icon-" + item + "\" data-action=\"" + item + "\"></i>";
+        return html += "<i class=\"dante-icon icon-" + item + "\" data-action=\"" + item + "\"></i>";
       });
       return html;
     };
@@ -13550,25 +13607,52 @@ if ( typeof define === "function" ) {
     };
 
     Menu.prototype.handleClick = function(ev) {
-      var element, name, value;
+      var action, element, input;
       element = $(ev.currentTarget);
-      name = element.data("action");
-      value = $(this.el).find("input").val();
-      utils.log("menu " + name + " item clicked!");
-      if (this.commandsReg.block.test(name)) {
+      action = element.data("action");
+      input = $(this.el).find("input.dante-input");
+      utils.log("menu " + action + " item clicked!");
+      if (!/(?:createlink)/.test(action)) {
+        this.menuApply(action);
+      }
+      input.show();
+      input.focus();
+      return false;
+    };
+
+    Menu.prototype.handleInputEnter = function(e) {
+      if (e.which === 13) {
+        return this.createlink($(e.target));
+      }
+    };
+
+    Menu.prototype.createlink = function(input) {
+      var action, inputValue;
+      input.hide();
+      if (input.val()) {
+        inputValue = input.val().replace(this.strReg.whiteSpace, "").replace(this.strReg.mailTo, "mailto:$1").replace(this.strReg.http, "http://$1");
+        return this.menuApply("createlink", inputValue);
+      }
+      action = "unlink";
+      return this.menuApply(action);
+    };
+
+    Menu.prototype.menuApply = function(action, value) {
+      utils.restoreSelection(this.savedSel);
+      if (this.commandsReg.block.test(action)) {
         utils.log("block here");
-        this.commandBlock(name);
-      } else if (this.commandsReg.inline.test(name) || this.commandsReg.source.test(name)) {
+        this.commandBlock(action);
+      } else if (this.commandsReg.inline.test(action) || this.commandsReg.source.test(action)) {
         utils.log("overall here");
-        this.commandOverall(name, value);
-      } else if (this.commandsReg.insert.test(name)) {
+        this.commandOverall(action, value);
+      } else if (this.commandsReg.insert.test(action)) {
         utils.log("insert here");
-        this.commandInsert(name);
-      } else if (this.commandsReg.wrap.test(name)) {
+        this.commandInsert(action);
+      } else if (this.commandsReg.wrap.test(action)) {
         utils.log("wrap here");
-        this.commandWrap(name);
+        this.commandWrap(action);
       } else {
-        utils.log("can't find command function for name: " + name);
+        utils.log("can't find command function for action: " + action);
       }
       this.setupInsertedElement(current_editor.getNode());
       return false;
@@ -13577,7 +13661,8 @@ if ( typeof define === "function" ) {
     Menu.prototype.setupInsertedElement = function(element) {
       var n;
       n = current_editor.addClassesToElement(element);
-      return current_editor.setElementName(n);
+      current_editor.setElementName(n);
+      return current_editor.markAsSelected(n);
     };
 
     Menu.prototype.cleanContents = function() {
@@ -13585,10 +13670,15 @@ if ( typeof define === "function" ) {
     };
 
     Menu.prototype.commandOverall = function(cmd, val) {
-      var message;
+      var a, message, n;
       message = " to exec 「" + cmd + "」 command" + (val ? " with value: " + val : "");
       if (document.execCommand(cmd, false, val)) {
         utils.log("success" + message);
+        if (cmd === "createlink") {
+          a = utils.saveSelection();
+          n = a[0].commonAncestorContainer.parentElement;
+          current_editor.setupLink(n);
+        }
       } else {
         utils.log("fail" + message, true);
       }
@@ -13645,7 +13735,8 @@ if ( typeof define === "function" ) {
 
     Menu.prototype.show = function() {
       $(this.el).css("opacity", 1);
-      return $(this.el).css('visibility', 'visible');
+      $(this.el).css('visibility', 'visible');
+      return this.savedSel = utils.saveSelection();
     };
 
     Menu.prototype.hide = function() {
