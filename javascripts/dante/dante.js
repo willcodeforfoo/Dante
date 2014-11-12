@@ -1194,15 +1194,12 @@
     };
 
     Menu.prototype.commandOverall = function(cmd, val) {
-      var a, message, n;
+      var message, n;
       message = " to exec 「" + cmd + "」 command" + (val ? " with value: " + val : "");
       if (document.execCommand(cmd, false, val)) {
         utils.log("success" + message);
-        if (cmd === "createlink") {
-          a = utils.saveSelection();
-          n = a[0].commonAncestorContainer.parentElement;
-          current_editor.setupLink(n);
-        }
+        n = current_editor.getNode();
+        current_editor.setupLinks($(n).find("a"));
       } else {
         utils.log("fail" + message, true);
       }
