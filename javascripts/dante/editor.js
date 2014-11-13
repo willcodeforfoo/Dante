@@ -87,10 +87,10 @@
     }
   };
 
-  Editor.MainEditor = (function(_super) {
-    __extends(MainEditor, _super);
+  Dante.Editor = (function(_super) {
+    __extends(Editor, _super);
 
-    function MainEditor() {
+    function Editor() {
       this.setupFirstAndLast = __bind(this.setupFirstAndLast, this);
       this.addClassesToElement = __bind(this.addClassesToElement, this);
       this.handlePaste = __bind(this.handlePaste, this);
@@ -106,10 +106,10 @@
       this.appendMenus = __bind(this.appendMenus, this);
       this.template = __bind(this.template, this);
       this.initialize = __bind(this.initialize, this);
-      return MainEditor.__super__.constructor.apply(this, arguments);
+      return Editor.__super__.constructor.apply(this, arguments);
     }
 
-    MainEditor.prototype.events = {
+    Editor.prototype.events = {
       "blur": "handleBlur",
       "mouseup": "handleMouseUp",
       "keydown": "handleKeyDown",
@@ -118,7 +118,7 @@
       "click .graf--figure": "handleGrafFigureSelect"
     };
 
-    MainEditor.prototype.initialize = function(opts) {
+    Editor.prototype.initialize = function(opts) {
       if (opts == null) {
         opts = {};
       }
@@ -145,7 +145,7 @@
       return this.extract_placeholder = "<span class='defaultValue defaultValue--prompt'>Paste a link to embed content from another site (e.g. Twitter) and press Enter</span><br>";
     };
 
-    MainEditor.prototype.store = function() {
+    Editor.prototype.store = function() {
       localStorage.setItem("contenteditable", $(this.el).html());
       return setTimeout((function(_this) {
         return function() {
@@ -154,27 +154,27 @@
       })(this), 5000);
     };
 
-    MainEditor.prototype.template = function() {
+    Editor.prototype.template = function() {
       return "<section class='section--first section--last'> <div class='section-divider layoutSingleColumn'> <hr class='section-divider'> </div> <div class='section-content'> <div class='section-inner'> <p class='graf--h3'>" + this.title_placeholder + "</p> <p class='graf--p'>" + this.body_placeholder + "<p> </div> </div> </section>";
     };
 
-    MainEditor.prototype.baseParagraphTmpl = function() {
+    Editor.prototype.baseParagraphTmpl = function() {
       return "<p class='graf--p' name='" + (utils.generateUniqueName()) + "'><br></p>";
     };
 
-    MainEditor.prototype.appendMenus = function() {
+    Editor.prototype.appendMenus = function() {
       $("<div id='dante-menu' class='dante-menu' style='opacity: 0;'></div>").insertAfter(this.el);
       $("<div class='inlineTooltip2 button-scalableGroup'></div>").insertAfter(this.el);
-      this.editor_menu = new Editor.Menu();
-      this.tooltip_view = new Editor.Tooltip();
+      this.editor_menu = new Dante.Editor.Menu();
+      this.tooltip_view = new Dante.Editor.Tooltip();
       return this.tooltip_view.render();
     };
 
-    MainEditor.prototype.appendInitialContent = function() {
+    Editor.prototype.appendInitialContent = function() {
       return $(this.el).find(".section-inner").html(this.initial_html);
     };
 
-    MainEditor.prototype.start = function() {
+    Editor.prototype.start = function() {
       this.render();
       $(this.el).attr("contenteditable", "true");
       $(this.el).addClass("postField--body");
@@ -186,16 +186,16 @@
       return this.setupElementsClasses();
     };
 
-    MainEditor.prototype.restart = function() {
+    Editor.prototype.restart = function() {
       return this.render();
     };
 
-    MainEditor.prototype.render = function() {
+    Editor.prototype.render = function() {
       this.template();
       return $(this.el).html(this.template());
     };
 
-    MainEditor.prototype.getSelectedText = function() {
+    Editor.prototype.getSelectedText = function() {
       var text;
       text = "";
       if (typeof window.getSelection !== "undefined") {
@@ -206,7 +206,7 @@
       return text;
     };
 
-    MainEditor.prototype.selection = function() {
+    Editor.prototype.selection = function() {
       selection;
       var selection;
       if (window.getSelection) {
@@ -216,7 +216,7 @@
       }
     };
 
-    MainEditor.prototype.getRange = function() {
+    Editor.prototype.getRange = function() {
       var editor, range;
       editor = $(this.el)[0];
       range = selection && selection.rangeCount && selection.getRangeAt(0);
@@ -231,7 +231,7 @@
       return range;
     };
 
-    MainEditor.prototype.setRange = function(range) {
+    Editor.prototype.setRange = function(range) {
       range = range || this.current_range;
       if (!range) {
         range = this.getRange();
@@ -242,7 +242,7 @@
       return this;
     };
 
-    MainEditor.prototype.getCharacterPrecedingCaret = function() {
+    Editor.prototype.getCharacterPrecedingCaret = function() {
       var precedingChar, precedingRange, range, sel;
       precedingChar = "";
       sel = void 0;
@@ -266,22 +266,22 @@
       return precedingChar;
     };
 
-    MainEditor.prototype.isLastChar = function() {
+    Editor.prototype.isLastChar = function() {
       return $(this.getNode()).text().trim().length === this.getCharacterPrecedingCaret().trim().length;
     };
 
-    MainEditor.prototype.isFirstChar = function() {
+    Editor.prototype.isFirstChar = function() {
       return this.getCharacterPrecedingCaret().trim().length === 0;
     };
 
-    MainEditor.prototype.isSelectingAll = function(element) {
+    Editor.prototype.isSelectingAll = function(element) {
       var a, b;
       a = this.getSelectedText().killWhiteSpace().length;
       b = $(element).text().killWhiteSpace().length;
       return a === b;
     };
 
-    MainEditor.prototype.setRangeAt = function(element, int) {
+    Editor.prototype.setRangeAt = function(element, int) {
       var range, sel;
       if (int == null) {
         int = 0;
@@ -295,7 +295,7 @@
       return element.focus();
     };
 
-    MainEditor.prototype.focus = function(focusStart) {
+    Editor.prototype.focus = function(focusStart) {
       if (!focusStart) {
         this.setRange();
       }
@@ -303,14 +303,14 @@
       return this;
     };
 
-    MainEditor.prototype.focusNode = function(node, range) {
+    Editor.prototype.focusNode = function(node, range) {
       range.setStartAfter(node);
       range.setEndBefore(node);
       range.collapse(false);
       return this.setRange(range);
     };
 
-    MainEditor.prototype.getNode = function() {
+    Editor.prototype.getNode = function() {
       var node, range, root;
       node = void 0;
       root = $(this.el).find(".section-inner")[0];
@@ -335,7 +335,7 @@
       }
     };
 
-    MainEditor.prototype.displayMenu = function(sel) {
+    Editor.prototype.displayMenu = function(sel) {
       return setTimeout((function(_this) {
         return function() {
           var pos;
@@ -347,7 +347,7 @@
       })(this), 10);
     };
 
-    MainEditor.prototype.getSelectionDimensions = function() {
+    Editor.prototype.getSelectionDimensions = function() {
       var height, left, range, rect, sel, top, width;
       sel = document.selection;
       range = void 0;
@@ -380,7 +380,7 @@
       };
     };
 
-    MainEditor.prototype.handleTextSelection = function(anchor_node) {
+    Editor.prototype.handleTextSelection = function(anchor_node) {
       var text;
       this.editor_menu.hide();
       text = this.getSelectedText();
@@ -390,7 +390,7 @@
       }
     };
 
-    MainEditor.prototype.relocateMenu = function(position) {
+    Editor.prototype.relocateMenu = function(position) {
       var l, padd, top;
       padd = this.editor_menu.$el.width() / 2;
       top = position.top + $(window).scrollTop() - 43;
@@ -401,23 +401,23 @@
       });
     };
 
-    MainEditor.prototype.hidePlaceholder = function(element) {
+    Editor.prototype.hidePlaceholder = function(element) {
       return $(element).find("span.defaultValue").remove().html("<br>");
     };
 
-    MainEditor.prototype.displayEmptyPlaceholder = function(element) {
+    Editor.prototype.displayEmptyPlaceholder = function(element) {
       $(".graf--first").html(this.title_placeholder);
       return $(".graf--last").html(this.body_placeholder);
     };
 
-    MainEditor.prototype.handleGrafFigureSelect = function(ev) {
+    Editor.prototype.handleGrafFigureSelect = function(ev) {
       var element;
       element = ev.currentTarget;
       this.markAsSelected(element);
       return this.setRangeAt($(element).find('.imageCaption')[0]);
     };
 
-    MainEditor.prototype.handleBlur = function(ev) {
+    Editor.prototype.handleBlur = function(ev) {
       setTimeout((function(_this) {
         return function() {
           if (!selected_menu) {
@@ -428,7 +428,7 @@
       return false;
     };
 
-    MainEditor.prototype.handleMouseUp = function(ev) {
+    Editor.prototype.handleMouseUp = function(ev) {
       var anchor_node;
       utils.log("MOUSE UP");
       anchor_node = this.getNode();
@@ -443,7 +443,7 @@
       return this.displayTooltipAt(anchor_node);
     };
 
-    MainEditor.prototype.scrollTo = function(node) {
+    Editor.prototype.scrollTo = function(node) {
       var top;
       top = node.offset().top;
       return $('html, body').animate({
@@ -451,7 +451,7 @@
       }, 20);
     };
 
-    MainEditor.prototype.handleArrow = function(ev) {
+    Editor.prototype.handleArrow = function(ev) {
       var current_node;
       current_node = $(this.getNode());
       if (current_node) {
@@ -460,7 +460,7 @@
       }
     };
 
-    MainEditor.prototype.handleArrowDown = function(ev) {
+    Editor.prototype.handleArrowDown = function(ev) {
       var current_node, ev_type, n, next_node, num, prev_node;
       current_node = $(this.getNode());
       utils.log(ev);
@@ -539,7 +539,7 @@
       }
     };
 
-    MainEditor.prototype.handlePaste = function(ev) {
+    Editor.prototype.handlePaste = function(ev) {
       var cbd, pastedText;
       utils.log("pasted!");
       this.aa = this.getNode();
@@ -577,7 +577,7 @@
       }
     };
 
-    MainEditor.prototype.handleUnwrappedImages = function(elements) {
+    Editor.prototype.handleUnwrappedImages = function(elements) {
       return _.each(elements.find("img"), (function(_this) {
         return function(image) {
           utils.log("process image here!");
@@ -586,7 +586,7 @@
       })(this));
     };
 
-    MainEditor.prototype.handleInmediateDeletion = function(element) {
+    Editor.prototype.handleInmediateDeletion = function(element) {
       var new_node;
       this.inmediateDeletion = false;
       new_node = $(this.baseParagraphTmpl()).insertBefore($(element));
@@ -595,7 +595,7 @@
       return $(element).remove();
     };
 
-    MainEditor.prototype.handleUnwrappedNode = function(element) {
+    Editor.prototype.handleUnwrappedNode = function(element) {
       var new_node, tmpl;
       tmpl = $(this.baseParagraphTmpl());
       this.setElementName(tmpl);
@@ -606,7 +606,7 @@
       return false;
     };
 
-    MainEditor.prototype.handleNullAnchor = function() {
+    Editor.prototype.handleNullAnchor = function() {
       var node, num, prev, range, sel, span;
       utils.log("ALARM ALARM this is an empty node");
       sel = window.getSelection();
@@ -636,7 +636,7 @@
       }
     };
 
-    MainEditor.prototype.handleCompleteDeletion = function(element) {
+    Editor.prototype.handleCompleteDeletion = function(element) {
       if (_.isEmpty($(element).text().trim())) {
         utils.log("HANDLE COMPLETE DELETION");
         this.render();
@@ -649,7 +649,7 @@
       }
     };
 
-    MainEditor.prototype.handleKeyDown = function(e) {
+    Editor.prototype.handleKeyDown = function(e) {
       var anchor_node, parent;
       utils.log("KEYDOWN");
       anchor_node = this.getNode();
@@ -754,7 +754,7 @@
       }
     };
 
-    MainEditor.prototype.handleKeyUp = function(e, node) {
+    Editor.prototype.handleKeyUp = function(e, node) {
       var anchor_node;
       utils.log("KEYUP");
       this.editor_menu.hide();
@@ -795,7 +795,7 @@
       }
     };
 
-    MainEditor.prototype.handleLineBreakWith = function(element_type, from_element) {
+    Editor.prototype.handleLineBreakWith = function(element_type, from_element) {
       var new_paragraph;
       new_paragraph = $("<" + element_type + " class='graf graf--" + element_type + " graf--empty is-selected'><br/></" + element_type + ">");
       if (from_element.parent().is('[class^="graf--"]')) {
@@ -806,7 +806,7 @@
       return this.setRangeAt(new_paragraph[0]);
     };
 
-    MainEditor.prototype.displayTooltipAt = function(element) {
+    Editor.prototype.displayTooltipAt = function(element) {
       utils.log("POSITION FOR TOOLTIP");
       if (!element) {
         return;
@@ -823,7 +823,7 @@
       });
     };
 
-    MainEditor.prototype.markAsSelected = function(element) {
+    Editor.prototype.markAsSelected = function(element) {
       $(this.el).find(".is-selected").removeClass("is-mediaFocused is-selected");
       $(element).addClass("is-selected");
       if ($(element).prop("tagName").toLowerCase() === "figure") {
@@ -838,7 +838,7 @@
       }
     };
 
-    MainEditor.prototype.addClassesToElement = function(element) {
+    Editor.prototype.addClassesToElement = function(element) {
       var n, name;
       n = element;
       name = $(n).prop("tagName").toLowerCase();
@@ -882,7 +882,7 @@
       return n;
     };
 
-    MainEditor.prototype.setupElementsClasses = function(element, cb) {
+    Editor.prototype.setupElementsClasses = function(element, cb) {
       if (_.isUndefined(element)) {
         this.element = $(this.el).find('.section-inner');
       } else {
@@ -907,7 +907,7 @@
       })(this), 20);
     };
 
-    MainEditor.prototype.cleanContents = function(element) {
+    Editor.prototype.cleanContents = function(element) {
       var s;
       if (_.isUndefined(element)) {
         this.element = $(this.el).find('.section-inner');
@@ -999,7 +999,7 @@
       }
     };
 
-    MainEditor.prototype.setupLinks = function(elems) {
+    Editor.prototype.setupLinks = function(elems) {
       return _.each(elems, (function(_this) {
         return function(n) {
           return _this.setupLink(n);
@@ -1007,7 +1007,7 @@
       })(this));
     };
 
-    MainEditor.prototype.setupLink = function(n) {
+    Editor.prototype.setupLink = function(n) {
       var href, parent_name;
       parent_name = $(n).parent().prop("tagName").toLowerCase();
       $(n).addClass("markup--anchor markup--" + parent_name + "-anchor");
@@ -1015,7 +1015,7 @@
       return $(n).attr("data-href", href);
     };
 
-    MainEditor.prototype.preCleanNode = function(element) {
+    Editor.prototype.preCleanNode = function(element) {
       var s;
       s = new Sanitize({
         elements: ['strong', 'em', 'br', 'a', 'b', 'u', 'i'],
@@ -1033,7 +1033,7 @@
       return $(element);
     };
 
-    MainEditor.prototype.setupFirstAndLast = function() {
+    Editor.prototype.setupFirstAndLast = function() {
       var childs;
       childs = $(this.el).find(".section-inner").children();
       childs.removeClass("graf--last , graf--first");
@@ -1041,7 +1041,7 @@
       return childs.last().addClass("graf--last");
     };
 
-    MainEditor.prototype.wrapTextNodes = function(element) {
+    Editor.prototype.wrapTextNodes = function(element) {
       if (_.isUndefined(element)) {
         element = $(this.el).find('.section-inner');
       } else {
@@ -1052,15 +1052,15 @@
       }).wrap("<p class='graf grap--p'></p>");
     };
 
-    MainEditor.prototype.setElementName = function(element) {
+    Editor.prototype.setElementName = function(element) {
       return $(element).attr("name", utils.generateUniqueName());
     };
 
-    return MainEditor;
+    return Editor;
 
   })(Dante.View);
 
-  Editor.Menu = (function(_super) {
+  Dante.Editor.Menu = (function(_super) {
     __extends(Menu, _super);
 
     function Menu() {
@@ -1269,7 +1269,7 @@
 
   })(Dante.View);
 
-  Editor.Tooltip = (function(_super) {
+  Dante.Editor.Tooltip = (function(_super) {
     __extends(Tooltip, _super);
 
     function Tooltip() {
