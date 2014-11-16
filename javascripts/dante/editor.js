@@ -1421,6 +1421,7 @@
       action = element.data("action");
       input = $(this.el).find("input.dante-input");
       utils.log("menu " + action + " item clicked!");
+      this.savedSel = utils.saveSelection();
       if (/(?:createlink)/.test(action)) {
         input.show();
         input.focus();
@@ -1432,6 +1433,7 @@
 
     Menu.prototype.handleInputEnter = function(e) {
       if (e.which === 13) {
+        utils.restoreSelection(this.savedSel);
         return this.createlink($(e.target));
       }
     };
@@ -1448,7 +1450,6 @@
     };
 
     Menu.prototype.menuApply = function(action, value) {
-      utils.restoreSelection(this.savedSel);
       if (this.commandsReg.block.test(action)) {
         utils.log("block here");
         this.commandBlock(action);
@@ -1464,7 +1465,6 @@
       } else {
         utils.log("can't find command function for action: " + action);
       }
-      this.setupInsertedElement(this.current_editor.getNode());
       return false;
     };
 
@@ -1486,6 +1486,7 @@
         utils.log("success" + message);
         n = this.current_editor.getNode();
         this.current_editor.setupLinks($(n).find("a"));
+        this.displayHighlights();
       } else {
         utils.log("fail" + message, true);
       }
@@ -1540,10 +1541,59 @@
       return selected_menu = true;
     };
 
+    Menu.prototype.displayHighlights = function() {
+      var nodes;
+      $(this.el).find(".active").removeClass("active");
+      nodes = this.effectNode(utils.getNode());
+      utils.log(nodes);
+      return _.each(nodes, (function(_this) {
+        return function(node) {
+          var tag;
+          tag = node.nodeName.toLowerCase();
+          switch (tag) {
+            case "a":
+              menu.querySelector("input").value = item.getAttribute("href");
+              tag = "createlink";
+              break;
+            case "img":
+              menu.querySelector("input").value = item.getAttribute("src");
+              tag = "insertimage";
+              break;
+            case "i":
+              tag = "italic";
+              break;
+            case "u":
+              tag = "underline";
+              break;
+            case "b":
+              tag = "bold";
+              break;
+            case "code":
+              tag = "code";
+              break;
+            case "ul":
+              tag = "insertunorderedlist";
+              break;
+            case "ol":
+              tag = "insertorderedlist";
+              break;
+            case "li":
+              tag = "indent";
+              utils.log("nothing to select");
+          }
+          return _this.highlight(tag);
+        };
+      })(this));
+    };
+
+    Menu.prototype.highlight = function(tag) {
+      return $(".icon-" + tag).addClass("active");
+    };
+
     Menu.prototype.show = function() {
       $(this.el).css("opacity", 1);
       $(this.el).css('visibility', 'visible');
-      return this.savedSel = utils.saveSelection();
+      return this.displayHighlights();
     };
 
     Menu.prototype.hide = function() {
