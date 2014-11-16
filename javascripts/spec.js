@@ -1,4 +1,17 @@
 (function() {
+  window.editor = new Dante.Editor({
+    upload_url: "/images.json",
+    el: "#editor1"
+  });
+
+  window.editor.start();
+
+  QUnit.test("should initialize editor", function(assert) {
+    return assert.ok(_.isObject(window.editor), "Passed!");
+  });
+
+}).call(this);
+(function() {
   var TestView, TestViewOpts, TestViewWithEl, TestViewWithEvents,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -146,6 +159,12 @@
 
   window.editor.start();
 
+  window.editor2 = new Dante.Editor({
+    el: "#editor2"
+  });
+
+  window.editor2.start();
+
   QUnit.test("should initialize editor", function(assert) {
     return assert.ok(_.isObject(window.editor), "Passed!");
   });
@@ -160,10 +179,10 @@
     return assert.ok(!_.isEmpty(window.editor.extract_url), "Passed!");
   });
 
-  QUnit.test("should init current_editor", function(assert) {
-    assert.ok(!_.isEmpty(window.current_editor), "Passed!");
-    assert.ok(_.isObject(window.current_editor.tooltip_view), "Passed!");
-    return assert.ok(_.isObject(window.current_editor.editor_menu), "Passed!");
+  QUnit.test("should init editor", function(assert) {
+    assert.ok(!_.isEmpty(window.editor), "Passed!");
+    assert.ok(_.isObject(window.editor.tooltip_view), "Passed!");
+    return assert.ok(_.isObject(window.editor.editor_menu), "Passed!");
   });
 
   QUnit.test("should build tooltip & menu", function(assert) {
@@ -172,7 +191,24 @@
   });
 
   QUnit.test("should display placeholders when empty content", function(assert) {
-    return assert.ok($("span.defaultValue").length === 2, "Passed!");
+    return assert.ok($(editor.el).find("span.defaultValue").length === 2, "Passed!");
+  });
+
+  QUnit.test("should clean spans", function(assert) {
+    assert.ok(!$(editor2.el).find("a:first span").exists(), "Passed!");
+    assert.ok(!$(editor2.el).find(".section-inner div.class").exists(), "Passed!");
+    assert.ok(!$(editor2.el).find(".section-inner span:not(.defaultValue)").exists(), "Passed!");
+    return assert.ok(!$(editor2.el).find(".section-inner p span").exists(), "Passed!");
+  });
+
+  QUnit.test("should detect existing images", function(assert) {
+    var fig;
+    fig = $(editor2.el).find(".section-inner figure");
+    assert.ok($(fig).exists(), "generate figure.graf--figure");
+    assert.ok($(fig).find("img").exists(), "figure have image");
+    assert.ok(!_.isEmpty($(fig).find("img").attr('src')), "and image src");
+    assert.ok($(fig).find("figcaption").exists(), "and caption");
+    return assert.ok($(fig).find("figcaption span.defaultValue").exists(), "and caption span");
   });
 
 }).call(this);

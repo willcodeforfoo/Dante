@@ -448,7 +448,7 @@ button, html input[type="button"], input[type="reset"], input[type="submit"] {
   z-index: 500; }
 
 /* line 464, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
-.graf--figure.is-mediaFocused .graf-image {
+.graf--figure.is-mediaFocused .graf-image, .graf--figure.is-mediaFocused iframe {
   box-shadow: 0 0 0 3px #57ad68; }
 
 /* line 468, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
@@ -525,7 +525,7 @@ button, html input[type="button"], input[type="reset"], input[type="submit"] {
   font-weight: 300;
   letter-spacing: -0.02em;
   line-height: 1.2;
-  margin-bottom: -14px; }
+  margin-bottom: 0px; }
 
 /* line 544, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/stylesheets/editor.css.scss */
 .markup--mixtapeEmbed-em {

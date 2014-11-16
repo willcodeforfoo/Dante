@@ -1,7 +1,8 @@
 (function() {
   window.Dante = {
     View: {},
-    Editor: {}
+    Editor: {},
+    utils: {}
   };
 
 }).call(this);
