@@ -1,11 +1,10 @@
 (function() {
   window.Dante = {
-    View: {},
     Editor: {
       ToolTip: {},
       Menu: {}
     },
-    utils: {}
+    version: "0.0.1"
   };
 
 }).call(this);

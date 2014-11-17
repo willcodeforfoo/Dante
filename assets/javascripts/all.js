@@ -10873,12 +10873,11 @@ if ( typeof define === "function" ) {
 ;
 (function() {
   window.Dante = {
-    View: {},
     Editor: {
       ToolTip: {},
       Menu: {}
     },
-    utils: {}
+    version: "0.0.1"
   };
 
 }).call(this);
@@ -12856,6 +12855,10 @@ if ( typeof define === "function" ) {
         n = this.current_editor.getNode();
         this.current_editor.setupLinks($(n).find("a"));
         this.displayHighlights();
+        if ($(n).parent().hasClass("section-inner")) {
+          n = this.current_editor.addClassesToElement(n);
+          this.current_editor.setElementName(n);
+        }
       } else {
         utils.log("fail" + message, true);
       }
