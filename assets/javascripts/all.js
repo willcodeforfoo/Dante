@@ -11223,7 +11223,6 @@ if ( typeof define === "function" ) {
     };
 
     View.prototype.setEvent = function(opts) {
-      console.log(opts);
       if (!_.isEmpty(opts)) {
         return _.each(opts, (function(_this) {
           return function(f, key) {
@@ -11319,6 +11318,7 @@ if ( typeof define === "function" ) {
       this.oembed_url = opts.oembed_url || "http://api.embed.ly/1/oembed?url=";
       this.extract_url = opts.extract_url || "http://api.embed.ly/1/extract?key=86c28a410a104c8bb58848733c82f840&url=";
       this.default_loading_placeholder = opts.default_loading_placeholder || "/images/media-loading-placeholder.png";
+      this.store_url = opts.store_url;
       if (localStorage.getItem('contenteditable')) {
         $(this.el).html(localStorage.getItem('contenteditable'));
       }
@@ -11330,12 +11330,42 @@ if ( typeof define === "function" ) {
     };
 
     Editor.prototype.store = function() {
-      localStorage.setItem("contenteditable", $(this.el).html());
+      if (!this.store_url) {
+        return;
+      }
       return setTimeout((function(_this) {
         return function() {
-          return 1 + 1;
+          return _this.checkforStore();
         };
-      })(this), 5000);
+      })(this), 15000);
+    };
+
+    Editor.prototype.checkforStore = function() {
+      if (this.content === this.getContent()) {
+        utils.log("content not changed skip store");
+        return this.store();
+      } else {
+        utils.log("content changed! update");
+        this.content = this.getContent();
+        return $.ajax({
+          url: this.store_url,
+          method: "post",
+          data: this.getContent(),
+          success: function(res) {
+            utils.log("store!");
+            return utils.log(res);
+          },
+          complete: (function(_this) {
+            return function(jxhr) {
+              return _this.store();
+            };
+          })(this)
+        });
+      }
+    };
+
+    Editor.prototype.getContent = function() {
+      return $(this.el).find(".section-inner").html();
     };
 
     Editor.prototype.template = function() {
@@ -12074,7 +12104,7 @@ if ( typeof define === "function" ) {
     Editor.prototype.addClassesToElement = function(element) {
       var n, name;
       n = element;
-      name = $(n).prop("tagName").toLowerCase();
+      name = n.nodeName.toLowerCase();
       switch (name) {
         case "p":
         case "h2":

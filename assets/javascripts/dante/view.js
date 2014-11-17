@@ -40,7 +40,6 @@
     };
 
     View.prototype.setEvent = function(opts) {
-      console.log(opts);
       if (!_.isEmpty(opts)) {
         return _.each(opts, (function(_this) {
           return function(f, key) {
