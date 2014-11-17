@@ -4,6 +4,9 @@
       ToolTip: {},
       Menu: {}
     },
+    defaults: {
+      image_placeholder: '../images/dante/media-loading-placeholder.png'
+    },
     version: "0.0.1"
   };
 
@@ -424,7 +427,6 @@
     }
 
     Editor.prototype.events = {
-      "blur": "handleBlur",
       "mouseup": "handleMouseUp",
       "keydown": "handleKeyDown",
       "keyup": "handleKeyUp",
@@ -448,8 +450,9 @@
       this.upload_url = opts.upload_url || "/uploads.json";
       this.oembed_url = opts.oembed_url || "http://api.embed.ly/1/oembed?url=";
       this.extract_url = opts.extract_url || "http://api.embed.ly/1/extract?key=86c28a410a104c8bb58848733c82f840&url=";
-      this.default_loading_placeholder = opts.default_loading_placeholder || "/images/media-loading-placeholder.png";
+      this.default_loading_placeholder = opts.default_loading_placeholder || Dante.defaults.image_placeholder;
       this.store_url = opts.store_url;
+      this.store_interval = opts.store_interval || 15000;
       if (localStorage.getItem('contenteditable')) {
         $(this.el).html(localStorage.getItem('contenteditable'));
       }
@@ -468,7 +471,7 @@
         return function() {
           return _this.checkforStore();
         };
-      })(this), 15000);
+      })(this), this.store_interval);
     };
 
     Editor.prototype.checkforStore = function() {
@@ -751,9 +754,7 @@
     Editor.prototype.handleBlur = function(ev) {
       setTimeout((function(_this) {
         return function() {
-          if (!selected_menu) {
-            return _this.editor_menu.hide();
-          }
+          return utils.log("not in use");
         };
       })(this), 200);
       return false;
@@ -2053,12 +2054,8 @@
           tag = node.nodeName.toLowerCase();
           switch (tag) {
             case "a":
-              menu.querySelector("input").value = item.getAttribute("href");
+              $(_this.el).find('input').val($(node).attr("href"));
               tag = "createlink";
-              break;
-            case "img":
-              menu.querySelector("input").value = item.getAttribute("src");
-              tag = "insertimage";
               break;
             case "i":
               tag = "italic";
