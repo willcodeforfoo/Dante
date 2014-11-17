@@ -1,7 +1,10 @@
 (function() {
   window.Dante = {
     View: {},
-    Editor: {},
+    Editor: {
+      ToolTip: {},
+      Menu: {}
+    },
     utils: {}
   };
 
