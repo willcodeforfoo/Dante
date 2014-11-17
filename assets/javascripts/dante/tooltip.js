@@ -49,10 +49,6 @@
           icon: "fa-code",
           title: "Add an embed",
           action: "embed-extract"
-        }, {
-          icon: "fa-minus",
-          title: "Add a new part",
-          action: "hr"
         }
       ];
     };
