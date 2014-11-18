@@ -33,7 +33,7 @@
   });
 
   QUnit.test("should build tooltip & menu", function(assert) {
-    assert.ok(!_.isEmpty($(".inlineTooltip2")), "Passed!");
+    assert.ok(!_.isEmpty($(".inlineTooltip")), "Passed!");
     return assert.ok(!_.isEmpty($("#editor-menu")), "Passed!");
   });
 

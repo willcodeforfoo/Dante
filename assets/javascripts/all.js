@@ -10880,7 +10880,7 @@ if ( typeof define === "function" ) {
     defaults: {
       image_placeholder: '../images/dante/media-loading-placeholder.png'
     },
-    version: "0.0.1"
+    version: "0.0.2"
   };
 
 }).call(this);
@@ -11330,7 +11330,7 @@ if ( typeof define === "function" ) {
         $(this.el).html(localStorage.getItem('contenteditable'));
       }
       this.store();
-      this.title_placeholder = "<span class='defaultValue defaultValue--root'>Title…</span><br>";
+      this.title_placeholder = "<span class='defaultValue defaultValue--root'>Title</span><br>";
       this.body_placeholder = "<span class='defaultValue defaultValue--root'>Tell your story…</span><br>";
       this.embed_placeholder = "<span class='defaultValue defaultValue--prompt'>Paste a YouTube, Vine, Vimeo, or other video link, and press Enter</span><br>";
       return this.extract_placeholder = "<span class='defaultValue defaultValue--prompt'>Paste a link to embed content from another site (e.g. Twitter) and press Enter</span><br>";
@@ -11376,7 +11376,7 @@ if ( typeof define === "function" ) {
     };
 
     Editor.prototype.template = function() {
-      return "<section class='section--first section--last'> <div class='section-divider layoutSingleColumn'> <hr class='section-divider'> </div> <div class='section-content'> <div class='section-inner'> <p class='graf graf--h3'>" + this.title_placeholder + "</p> <p class='graf graf--p'>" + this.body_placeholder + "<p> </div> </div> </section>";
+      return "<section class='section--first section--last'> <div class='section-divider layoutSingleColumn'> <hr class='section-divider'> </div> <div class='section-content'> <div class='section-inner'> <h3 class='graf graf--h3'>" + this.title_placeholder + "</h3> <p class='graf graf--p'>" + this.body_placeholder + "<p> </div> </div> </section>";
     };
 
     Editor.prototype.baseParagraphTmpl = function() {
@@ -11384,15 +11384,15 @@ if ( typeof define === "function" ) {
     };
 
     Editor.prototype.appendMenus = function() {
-      $("<div id='dante-menu' class='dante-menu' style='opacity: 0;'></div>").insertAfter(this.el);
-      $("<div class='inlineTooltip2 button-scalableGroup'></div>").insertAfter(this.el);
+      $("<div id='dante-menu' class='dante-menu'></div>").insertAfter(this.el);
+      $("<div class='inlineTooltip'></div>").insertAfter(this.el);
       this.editor_menu = new Dante.Editor.Menu({
         editor: this
       });
       this.tooltip_view = new Dante.Editor.Tooltip({
         editor: this
       });
-      return this.tooltip_view.render();
+      return this.tooltip_view.render().hide();
     };
 
     Editor.prototype.appendInitialContent = function() {
@@ -11598,12 +11598,13 @@ if ( typeof define === "function" ) {
     };
 
     Editor.prototype.relocateMenu = function(position) {
-      var l, padd, top;
+      var height, left, padd, top;
+      height = this.editor_menu.$el.outerHeight();
       padd = this.editor_menu.$el.width() / 2;
-      top = position.top + $(window).scrollTop() - 43;
-      l = position.left + (position.width / 2) - padd;
+      top = position.top + $(window).scrollTop() - height;
+      left = position.left + (position.width / 2) - padd;
       return this.editor_menu.$el.offset({
-        left: l,
+        left: left,
         top: top
       });
     };
@@ -11975,11 +11976,7 @@ if ( typeof define === "function" ) {
         }
         utils.log("pass initial validations");
         anchor_node = this.getNode();
-        utils.log("anchor_node");
-        utils.log(anchor_node);
-        utils.log("UTILS anchor_node");
         utils_anchor_node = utils.getNode();
-        utils.log(utils_anchor_node);
         if ($(utils_anchor_node).hasClass("section-content") || $(utils_anchor_node).hasClass("graf--first")) {
           utils.log("SECTION DETECTED FROM KEYDOWN " + (_.isEmpty($(utils_anchor_node).text())));
           if (_.isEmpty($(utils_anchor_node).text())) {
@@ -12011,7 +12008,12 @@ if ( typeof define === "function" ) {
       }
       if (_.contains([38, 40], e.which)) {
         utils.log(e.which);
-        return this.handleArrowForKeyDown(e);
+        this.handleArrowForKeyDown(e);
+      }
+      if (anchor_node) {
+        if (!_.isEmpty($(anchor_node).text())) {
+          return this.tooltip_view.hide();
+        }
       }
     };
 
@@ -12084,7 +12086,7 @@ if ( typeof define === "function" ) {
       this.tooltip_view.render();
       return this.tooltip_view.move({
         left: this.position.left - 60,
-        top: this.position.top - 5
+        top: this.position.top - 1
       });
     };
 
@@ -12112,8 +12114,12 @@ if ( typeof define === "function" ) {
       name = n.nodeName.toLowerCase();
       switch (name) {
         case "p":
+        case "h1":
         case "h2":
         case "h3":
+        case "h4":
+        case "h5":
+        case "h6":
         case "pre":
         case "div":
           if (!$(n).hasClass("graf--mixtapeEmbed")) {
@@ -12365,11 +12371,11 @@ if ( typeof define === "function" ) {
       return Tooltip.__super__.constructor.apply(this, arguments);
     }
 
-    Tooltip.prototype.el = ".inlineTooltip2";
+    Tooltip.prototype.el = ".inlineTooltip";
 
     Tooltip.prototype.events = {
-      "click .button--inlineTooltipControl": "toggleOptions",
-      "click .inlineTooltip2-menu .button": "handleClick"
+      "click .inlineTooltip-button.control": "toggleOptions",
+      "click .inlineTooltip-menu button": "handleClick"
     };
 
     Tooltip.prototype.initialize = function(opts) {
@@ -12400,9 +12406,9 @@ if ( typeof define === "function" ) {
       _.each(this.buttons, function(b) {
         var data_action_value;
         data_action_value = b.action_value ? "data-action-value='" + b.action_value + "'" : "";
-        return menu += "<button class='button button--small button--circle button--neutral button--scale u-transitionSeries' title='" + b.title + "' data-action='inline-menu-" + b.action + "' " + data_action_value + "> <span class='fa " + b.icon + "'></span> </button>";
+        return menu += "<button class='inlineTooltip-button scale' title='" + b.title + "' data-action='inline-menu-" + b.action + "' " + data_action_value + "> <span class='fa " + b.icon + "'></span> </button>";
       });
-      return "<button class='button button--small button--circle button--neutral button--inlineTooltipControl' title='Close Menu' data-action='inline-menu'> <span class='fa fa-plus'></span> </button> <div class='inlineTooltip2-menu'> " + menu + " </div>";
+      return "<button class='inlineTooltip-button control' title='Close Menu' data-action='inline-menu'> <span class='fa fa-plus'></span> </button> <div class='inlineTooltip-menu'> " + menu + " </div>";
     };
 
     Tooltip.prototype.insertTemplate = function() {
@@ -12729,7 +12735,7 @@ if ( typeof define === "function" ) {
     Menu.prototype.el = "#dante-menu";
 
     Menu.prototype.events = {
-      "mousedown i": "handleClick",
+      "mousedown li": "handleClick",
       "mouseenter": "handleOver",
       "mouseleave": "handleOut",
       "keypress input": "handleInputEnter"
@@ -12766,16 +12772,18 @@ if ( typeof define === "function" ) {
             'indent', 'outdent', 'bold', 'italic', 'underline', 'createlink'
           ]
          */
-        buttons: ['blockquote', 'h2', 'h3', 'bold', 'italic', 'createlink']
+        buttons: ['bold', 'italic', 'h2', 'h3', 'h4', 'blockquote', 'createlink']
       };
     };
 
     Menu.prototype.template = function() {
       var html;
-      html = "<input class='dante-input' placeholder='http://' style='display: none;'>";
+      html = "<div class='dante-menu-linkinput'><input class='dante-menu-input' placeholder='http://'><div class='dante-menu-button'>x</div></div>";
+      html += "<ul class='dante-menu-buttons'>";
       _.each(this.config.buttons, function(item) {
-        return html += "<i class=\"dante-icon icon-" + item + "\" data-action=\"" + item + "\"></i>";
+        return html += "<li class='dante-menu-button'><i class=\"dante-icon icon-" + item + "\" data-action=\"" + item + "\"></i></li>";
       });
+      html += "</ul>";
       return html;
     };
 
@@ -12786,13 +12794,13 @@ if ( typeof define === "function" ) {
 
     Menu.prototype.handleClick = function(ev) {
       var action, element, input;
-      element = $(ev.currentTarget);
+      element = $(ev.currentTarget).find('.dante-icon');
       action = element.data("action");
-      input = $(this.el).find("input.dante-input");
+      input = $(this.el).find("input.dante-menu-input");
       utils.log("menu " + action + " item clicked!");
       this.savedSel = utils.saveSelection();
       if (/(?:createlink)/.test(action)) {
-        input.show();
+        $(this.el).addClass("dante-menu--linkmode");
         input.focus();
       } else {
         this.menuApply(action);
@@ -12809,7 +12817,7 @@ if ( typeof define === "function" ) {
 
     Menu.prototype.createlink = function(input) {
       var action, inputValue;
-      input.hide();
+      $(this.el).removeClass("dante-menu--linkmode");
       if (input.val()) {
         inputValue = input.val().replace(this.strReg.whiteSpace, "").replace(this.strReg.mailTo, "mailto:$1").replace(this.strReg.http, "http://$1");
         return this.menuApply("createlink", inputValue);
@@ -12899,7 +12907,7 @@ if ( typeof define === "function" ) {
       el = el || this.current_editor.$el[0];
       while (el !== this.current_editor.$el[0]) {
         if (el.nodeName.match(this.effectNodeReg)) {
-          nodes.push((returnAsNodeName ? el.nodeName.toLowerCase() : el));
+          nodes.push((returnAsNodeName ? el.nodeName.toUpperCase() : el));
         }
         el = el.parentNode;
       }
@@ -12958,18 +12966,16 @@ if ( typeof define === "function" ) {
     };
 
     Menu.prototype.highlight = function(tag) {
-      return $(".icon-" + tag).addClass("active");
+      return $(".icon-" + tag).parent("li").addClass("active");
     };
 
     Menu.prototype.show = function() {
-      $(this.el).css("opacity", 1);
-      $(this.el).css('visibility', 'visible');
+      $(this.el).addClass("dante-menu--active");
       return this.displayHighlights();
     };
 
     Menu.prototype.hide = function() {
-      $(this.el).css("opacity", 0);
-      return $(this.el).css('visibility', 'hidden');
+      return $(this.el).removeClass("dante-menu--active");
     };
 
     return Menu;
