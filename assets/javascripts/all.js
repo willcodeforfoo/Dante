@@ -10880,7 +10880,7 @@ if ( typeof define === "function" ) {
     defaults: {
       image_placeholder: '../images/dante/media-loading-placeholder.png'
     },
-    version: "0.0.2"
+    version: "0.0.3"
   };
 
 }).call(this);
@@ -12868,6 +12868,7 @@ if ( typeof define === "function" ) {
           n = this.current_editor.addClassesToElement(n);
           this.current_editor.setElementName(n);
         }
+        this.current_editor.handleTextSelection(n);
       } else {
         utils.log("fail" + message, true);
       }
