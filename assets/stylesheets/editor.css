@@ -418,6 +418,7 @@ body {
   padding-top: 0; }
 /* line 21, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
 .graf--h3 {
+  font-family: "jaf-bernino-sans", "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
   letter-spacing: -0.02em;
   font-weight: 700;
   font-style: normal;
@@ -426,7 +427,7 @@ body {
   line-height: 1.2;
   margin-top: 40px;
   margin-bottom: 4px; }
-/* line 31, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
+/* line 32, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
 .graf--h4 {
   color: rgba(0, 0, 0, 0.44);
   font-family: "jaf-bernino-sans", "Open Sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
@@ -438,7 +439,7 @@ body {
   margin-bottom: 2px;
   margin-left: -1.5px;
   margin-top: 40px; }
-/* line 44, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
+/* line 45, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
 .graf--pre {
   background: none repeat scroll 0 0 rgba(0, 0, 0, 0.05);
   font-family: Monaco,"Courier New","Courier",monospace;
@@ -446,10 +447,10 @@ body {
   margin-bottom: 20px;
   padding: 20px;
   white-space: pre-wrap; }
-/* line 52, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
+/* line 53, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
 .graf--pre + .graf--pre {
   margin-top: -20px; }
-/* line 56, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
+/* line 57, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
 .graf--blockquote {
   border-left: 3px solid rgba(0, 0, 0, 0.8);
   font-family: "freight-text-pro", "Merriweather", Georgia, Cambria, "Times New Roman", Times, serif;
@@ -459,11 +460,11 @@ body {
   margin-left: -23px;
   padding-bottom: 3px;
   padding-left: 20px; }
-/* line 66, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
+/* line 67, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
 .graf--blockquote + .graf--blockquote {
   margin-top: -30px;
   padding-top: 30px; }
-/* line 71, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
+/* line 72, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
 .graf--figure {
   box-sizing: border-box;
   clear: both;
