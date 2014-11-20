@@ -1539,7 +1539,7 @@
     };
 
     Tooltip.prototype.insertTemplate = function() {
-      return "<figure contenteditable='false' class='graf graf--figure is-defaultValue' name='" + (utils.generateUniqueName()) + "' tabindex='0'> <div style='' class='aspectRatioPlaceholder is-locked'> <div style='padding-bottom: 100%;' class='aspect-ratio-fill'></div> <img src='' data-height='375' data-width='600' data-image-id='' class='graf-image' data-delayed-src=''> </div> <figcaption contenteditable='true' data-default-value='Type caption for image (optional)' class='imageCaption'> <span class='defaultValue'>Type caption for image (optional)</span> <br> </figcaption> </figure>";
+      return "<figure contenteditable='false' class='graf graf--figure is-defaultValue' name='" + (utils.generateUniqueName()) + "' tabindex='0'> <div style='' class='aspectRatioPlaceholder is-locked'> <div style='padding-bottom: 100%;' class='aspect-ratio-fill'></div> <img src='' data-height='' data-width='' data-image-id='' class='graf-image' data-delayed-src=''> </div> <figcaption contenteditable='true' data-default-value='Type caption for image (optional)' class='imageCaption'> <span class='defaultValue'>Type caption for image (optional)</span> <br> </figcaption> </figure>";
     };
 
     Tooltip.prototype.extractTemplate = function() {
@@ -1600,34 +1600,39 @@
         this.current_editor.addClassesToElement(node);
       } else {
         utils.log("DOS");
-        $(image_element).replaceWith(tmpl);
+        node = this.current_editor.getNode();
+        $(node).replaceWith(tmpl);
       }
-      utils.log(tmpl.attr('name'));
       return this.replaceImg(image_element, $("[name='" + (tmpl.attr('name')) + "']"));
     };
 
     Tooltip.prototype.replaceImg = function(image_element, figure) {
-      var img;
+      var img, self;
       utils.log(figure.attr("name"));
       utils.log(figure);
       $(image_element).remove();
       img = new Image();
+      img.src = image_element.src;
+      self = this;
       img.onload = function() {
-        console.log("and here comes the water!");
-        console.log(figure);
-        console.log(this.width + 'x' + this.height);
+        var ar;
+        utils.log("replace image with loaded info");
+        utils.log(figure);
+        utils.log(this.width + 'x' + this.height);
+        ar = self.getAspectRatio(this.width, this.height);
         figure.find(".aspectRatioPlaceholder").css({
-          'max-width': this.width,
-          'max-height': this.height,
-          'height': this.height
+          'max-width': ar.width,
+          'max-height': ar.height
         });
-        figure.find("img").attr({
-          'data-height': this.height,
-          'data-width': this.width
+        figure.find(".graf-image").attr({
+          "data-height": this.height,
+          "data-width": this.width
         });
-        return figure.find("img").attr('src', image_element.src);
+        return figure.find(".aspect-ratio-fill").css({
+          "padding-bottom": "" + ar.ratio + "%"
+        });
       };
-      return img.src = image_element.src;
+      return figure.find("img").attr("src", image_element.src);
     };
 
     Tooltip.prototype.displayAndUploadImages = function(file) {
@@ -1647,30 +1652,67 @@
 
     Tooltip.prototype.displayCachedImage = function(file) {
       var reader;
-      this.node = this.current_editor.getNode();
       this.current_editor.tooltip_view.hide();
       reader = new FileReader();
       reader.onload = (function(_this) {
         return function(e) {
-          var i, img_tag, new_tmpl, replaced_node;
-          i = new Image;
-          i.src = e.target.result;
-          new_tmpl = $(_this.insertTemplate());
-          replaced_node = $(new_tmpl).insertBefore($(_this.node));
-          img_tag = new_tmpl.find('img.graf-image').attr('src', e.target.result);
-          img_tag.height = i.height;
-          img_tag.width = i.width;
-          if (!(i.width === 0 || i.height === 0)) {
+          var img, node, self;
+          img = new Image;
+          img.src = e.target.result;
+          node = _this.current_editor.getNode();
+          self = _this;
+          return img.onload = function() {
+            var ar, img_tag, new_tmpl, replaced_node;
+            new_tmpl = $(self.insertTemplate());
+            replaced_node = $(new_tmpl).insertBefore($(node));
+            img_tag = new_tmpl.find('img.graf-image').attr('src', e.target.result);
+            img_tag.height = this.height;
+            img_tag.width = this.width;
             utils.log("UPLOADED SHOW FROM CACHE");
+            ar = self.getAspectRatio(this.width, this.height);
             replaced_node.find(".aspectRatioPlaceholder").css({
-              'max-width': i.width,
-              'max-height': i.height
+              'max-width': ar.width,
+              'max-height': ar.height
             });
-            return _this.uploadFile(file, replaced_node);
-          }
+            replaced_node.find(".graf-image").attr({
+              "data-height": this.height,
+              "data-width": this.width
+            });
+            replaced_node.find(".aspect-ratio-fill").css({
+              "padding-bottom": "" + ar.ratio + "%"
+            });
+            return self.uploadFile(file, replaced_node);
+          };
         };
       })(this);
       return reader.readAsDataURL(file);
+    };
+
+    Tooltip.prototype.getAspectRatio = function(w, h) {
+      var height, maxHeight, maxWidth, ratio, result, width;
+      maxWidth = 700;
+      maxHeight = 700;
+      ratio = 0;
+      width = w;
+      height = h;
+      if (width > maxWidth) {
+        ratio = maxWidth / width;
+        height = height * ratio;
+        width = width * ratio;
+      }
+      if (height > maxHeight) {
+        ratio = maxHeight / height;
+        width = width * ratio;
+        height = height * ratio;
+      }
+      ratio = height / maxHeight * 100;
+      result = {
+        width: width,
+        height: height,
+        ratio: ratio
+      };
+      utils.log(result);
+      return result;
     };
 
     Tooltip.prototype.formatData = function(file) {
