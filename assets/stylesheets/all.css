@@ -202,20 +202,27 @@
   margin-bottom: -16px; }
 
 /* line 8, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/all.css.scss */
-body {
-  border-top: 3px solid #1abf89; }
+body:after {
+  content: "";
+  position: fixed;
+  width: 100%;
+  height: 3px;
+  top: 0;
+  right: 0;
+  left: 0;
+  background-color: #1abf89; }
 
-/* line 11, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/all.css.scss */
+/* line 18, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/all.css.scss */
 article {
   margin-top: 70px;
   padding: 30px; }
 
-/* line 15, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/all.css.scss */
+/* line 22, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/all.css.scss */
 #editor {
   margin: 0 auto;
   max-width: 700px; }
 
-/* line 21, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/all.css.scss */
+/* line 28, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/all.css.scss */
 .logo {
   display: block;
   float: left;
@@ -224,26 +231,26 @@ article {
   left: 0;
   top: 28px; }
 
-/* line 30, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/all.css.scss */
+/* line 37, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/all.css.scss */
 .top-left,
 .top-right {
   position: fixed;
   top: 30px; }
 
-/* line 36, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/all.css.scss */
+/* line 43, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/all.css.scss */
 .top-left {
   left: 30px; }
 
-/* line 39, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/all.css.scss */
+/* line 46, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/all.css.scss */
 .top-right {
   right: 30px; }
 
-/* line 43, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/all.css.scss */
+/* line 50, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/all.css.scss */
 .github {
   font-size: 40px;
   color: #1abf89;
   line-height: 0; }
-  /* line 47, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/all.css.scss */
+  /* line 54, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/all.css.scss */
   .github i {
     position: relative;
     top: -2px; }

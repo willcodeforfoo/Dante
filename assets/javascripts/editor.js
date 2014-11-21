@@ -1203,7 +1203,12 @@
         }
       }
       if (_.contains([37, 38, 39, 40], e.which)) {
-        return this.handleArrow(e);
+        this.handleArrow(e);
+      }
+      if (anchor_node) {
+        if (!_.isEmpty($(anchor_node).text())) {
+          return $(anchor_node).removeClass("graf--empty");
+        }
       }
     };
 
@@ -1255,17 +1260,11 @@
     };
 
     Editor.prototype.addClassesToElement = function(element) {
-      var n, name;
+      var n, name, new_el;
       n = element;
       name = n.nodeName.toLowerCase();
       switch (name) {
         case "p":
-        case "h1":
-        case "h2":
-        case "h3":
-        case "h4":
-        case "h5":
-        case "h6":
         case "pre":
         case "div":
           if (!$(n).hasClass("graf--mixtapeEmbed")) {
@@ -1273,6 +1272,20 @@
           }
           if (name === "p" && $(n).find("br").length === 0) {
             $(n).append("<br>");
+          }
+          break;
+        case "h1":
+        case "h2":
+        case "h3":
+        case "h4":
+        case "h5":
+        case "h6":
+          if (name === "h1") {
+            new_el = $("<h2 class='graf graf--h2'>" + ($(n).text()) + "</h2>");
+            $(n).replaceWith(new_el);
+            this.setElementName(n);
+          } else {
+            $(n).removeClass().addClass("graf graf--" + name);
           }
           break;
         case "code":
@@ -1349,7 +1362,7 @@
         this.element = element;
       }
       s = new Sanitize({
-        elements: ['strong', 'img', 'em', 'br', 'a', 'blockquote', 'b', 'u', 'i', 'pre', 'p', 'h2', 'h3'],
+        elements: ['strong', 'img', 'em', 'br', 'a', 'blockquote', 'b', 'u', 'i', 'pre', 'p', 'h1', 'h2', 'h3', 'h4'],
         attributes: {
           '__ALL__': ['class'],
           a: ['href', 'title', 'target'],
