@@ -11304,7 +11304,8 @@ if ( typeof define === "function" ) {
       "keydown": "handleKeyDown",
       "keyup": "handleKeyUp",
       "paste": "handlePaste",
-      "click .graf--figure": "handleGrafFigureSelect"
+      "click .graf--figure": "handleGrafFigureSelect",
+      "dblclick": "handleDblclick"
     };
 
     Editor.prototype.initialize = function(opts) {
@@ -11325,6 +11326,7 @@ if ( typeof define === "function" ) {
       this.extract_url = opts.extract_url || "http://api.embed.ly/1/extract?key=86c28a410a104c8bb58848733c82f840&url=";
       this.default_loading_placeholder = opts.default_loading_placeholder || Dante.defaults.image_placeholder;
       this.store_url = opts.store_url;
+      this.spell_check = opts.spellcheck || false;
       this.store_interval = opts.store_interval || 15000;
       if (localStorage.getItem('contenteditable')) {
         $(this.el).html(localStorage.getItem('contenteditable'));
@@ -11396,7 +11398,8 @@ if ( typeof define === "function" ) {
     };
 
     Editor.prototype.appendInitialContent = function() {
-      return $(this.el).find(".section-inner").html(this.initial_html);
+      $(this.el).find(".section-inner").html(this.initial_html);
+      return $(this.el).attr("spellcheck", this.spell_check);
     };
 
     Editor.prototype.start = function() {
@@ -11408,7 +11411,8 @@ if ( typeof define === "function" ) {
       if (!_.isEmpty(this.initial_html.trim())) {
         this.appendInitialContent();
       }
-      return this.setupElementsClasses();
+      this.setupElementsClasses();
+      return this.parseInitialMess();
     };
 
     Editor.prototype.restart = function() {
@@ -11643,6 +11647,7 @@ if ( typeof define === "function" ) {
       if (_.isNull(anchor_node)) {
         return;
       }
+      this.prev_current_node = anchor_node;
       this.handleTextSelection(anchor_node);
       this.hidePlaceholder(anchor_node);
       this.markAsSelected(anchor_node);
@@ -11759,6 +11764,20 @@ if ( typeof define === "function" ) {
           }
           return utils.log("noting");
       }
+    };
+
+    Editor.prototype.parseInitialMess = function() {
+      return this.handleUnwrappedImages($(this.el).find('.section-inner'));
+    };
+
+    Editor.prototype.handleDblclick = function() {
+      var node;
+      utils.log("handleDblclick");
+      node = this.getNode();
+      if (_.isNull(node)) {
+        this.setRangeAt(this.prev_current_node);
+      }
+      return false;
     };
 
     Editor.prototype.handlePaste = function(ev) {
@@ -12158,6 +12177,11 @@ if ( typeof define === "function" ) {
         case "blockquote":
           n = $(n).removeClass().addClass("graf graf--" + name);
           break;
+        case "figure":
+          if ($(n).hasClass(".graf--figure")) {
+            n = $(n);
+          }
+          break;
         default:
           $(n).wrap("<p class='graf graf--" + name + "'></p>");
           n = $(n).parent();
@@ -12255,10 +12279,12 @@ if ( typeof define === "function" ) {
               return {
                 whitelist_nodes: [input.node]
               };
-            } else if (input.node_name === 'div' && ($(input.node).hasClass("aspect-ratio-fill") || $(input.node).hasClass("aspectRatioPlaceholder")) && $(input.node).parent(".graf--figure").exists()) {
+            } else if (input.node_name === 'div' && ($(input.node).hasClass("aspect-ratio-fill") && $(input.node).parent(".graf--figure").exists())) {
               return {
                 whitelist_nodes: [input.node]
               };
+            } else if (input.node_name === 'div' && ($(input.node).hasClass("aspectRatioPlaceholder") && $(input.node).parent(".aspect-ratio-fill").exists())) {
+
             } else if (input.node_name === 'img' && $(input.node).parent(".graf--figure").exists()) {
               return {
                 whitelist_nodes: [input.node]
@@ -12266,6 +12292,10 @@ if ( typeof define === "function" ) {
             } else if (input.node_name === 'a' && $(input.node).parent(".graf--mixtapeEmbed").exists()) {
               return {
                 attr_whitelist: ["style"]
+              };
+            } else if (input.node_name === 'figcaption' && $(input.node).parent(".graf--figure").exists()) {
+              return {
+                whitelist_nodes: [input.node]
               };
             } else if (input.node_name === 'span' && $(input.node).parent(".imageCaption").exists()) {
               return {
@@ -12455,7 +12485,7 @@ if ( typeof define === "function" ) {
     };
 
     Tooltip.prototype.uploadExistentImage = function(image_element, opts) {
-      var node, tmpl;
+      var i, img, n, node, tmpl, _i, _ref, _results;
       if (opts == null) {
         opts = {};
       }
@@ -12473,10 +12503,19 @@ if ( typeof define === "function" ) {
         this.current_editor.addClassesToElement(node);
       } else {
         utils.log("DOS");
-        node = this.current_editor.getNode();
-        $(node).replaceWith(tmpl);
+        img = $(image_element).parentsUntil(".section-inner").first();
+        $(img).replaceWith(tmpl);
       }
-      return this.replaceImg(image_element, $("[name='" + (tmpl.attr('name')) + "']"));
+      this.replaceImg(image_element, $("[name='" + (tmpl.attr('name')) + "']"));
+      n = $("[name='" + (tmpl.attr('name')) + "']").parentsUntil(".section-inner").length;
+      if (n !== 0) {
+        _results = [];
+        for (i = _i = 0, _ref = n - 1; _i <= _ref; i = _i += 1) {
+          $("[name='" + (tmpl.attr('name')) + "']").unwrap();
+          _results.push(console.log(i));
+        }
+        return _results;
+      }
     };
 
     Tooltip.prototype.replaceImg = function(image_element, figure) {
@@ -12778,6 +12817,7 @@ if ( typeof define === "function" ) {
 
     Menu.prototype.events = {
       "mousedown li": "handleClick",
+      "click .dante-menu-linkinput .dante-menu-button": "closeInput",
       "mouseenter": "handleOver",
       "mouseleave": "handleOut",
       "keypress input": "handleInputEnter"
@@ -12847,6 +12887,11 @@ if ( typeof define === "function" ) {
       } else {
         this.menuApply(action);
       }
+      return false;
+    };
+
+    Menu.prototype.closeInput = function(e) {
+      $(this.el).removeClass("dante-menu--linkmode");
       return false;
     };
 
