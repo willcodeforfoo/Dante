@@ -26,15 +26,33 @@
     <div class="notesSource">
 
       <div id="editor" class="postField postField--body editable smart-media-plugin">
-        <h2>Dante Editor</h2>
-<h3>Just another Medium editor clone.</h3>
-<p></p>
-<h4>Motivation</h4>
-<p>I´ve tried all the medium clones out there, they are really great and all have it´s pros & cons, but none of them have all the features that medium wysywig provides, so I wonder, how difficult could be build my own Medium clone?</p>
-<a href="https://github.com/michelson/dante">Fork me on github</a>
+        <h1 id="dante-editor">Dante Editor</h1>
 
-        
-        
+<h3 id="just-another-medium-editor-clone">Just another Medium editor clone.</h3>
+
+<h3 id="motivation">Motivation:</h3>
+
+<h4 id="so-far-i-have-tried-all-the-mediumcom-wysiwyg-clones-out-there-these-are-really-great-and-each-have-their-pros-and-cons-but-none-of-them-has-all-the-features-that-the-real-medium-editor-provideshttphowtoxcommedium-editor-clones-in-js">So far I have tried all the Medium.com wysiwyg clones out there, these are really great, and each have their pros and cons. <a href="http://howtox.com/medium-editor-clones-in-js/">But none of them has all the features that the real medium editor provides.</a></h4>
+<p>so I wonder, How complicated could be write my own Medium wysiwyg clone?</p>
+
+<h3 id="this-is-a-live-demo">This is a live demo:</h3>
+
+<p><img src="http://i.imgur.com/0erQFLu.gif" alt="" /></p>
+
+<p>This Library will work fine on latest versions of Chrome/Safari/FF/IE.
+We don't have any intention to target all browsers versions, really… if you like this library and you need backward compatibility for an specific version you can submit a patch to help with the development or just upgrade your shitty browser :D</p>
+
+<p><strong>BTW , this library is an official beta release, so there are known bugs that we are currently working on.</strong></p>
+
+<h3 id="maintainers">MAINTAINERS:</h3>
+
+<ul>
+  <li><a href="http://github.com/michelson">Miguel Michelson</a></li>
+  <li><a href="http://github.com/cristianferrarig">Cristian Ferrari</a></li>
+</ul>
+
+<p><a href="./license.md">Licensed under MIT.</a> 2014</p>
+
       </div>
 
     </div>
@@ -45,12 +63,10 @@
   editor = new Dante.Editor(
     {
       el: "#editor",
-      upload_url: "/uploads/new.json",
-      debug: true
+      upload_url: "/uploads/new.json"
     }
   ).start()
 </script>
-
 
   </body>
 </html>
