@@ -11304,8 +11304,11 @@ if ( typeof define === "function" ) {
       "keydown": "handleKeyDown",
       "keyup": "handleKeyUp",
       "paste": "handlePaste",
-      "click .graf--figure": "handleGrafFigureSelect",
-      "dblclick": "handleDblclick"
+      "click .graf--figure img": "handleGrafFigureSelectImg",
+      "click figcaption": "handleGrafFigureSelectCaption",
+      "dblclick": "handleDblclick",
+      "dragstart": "handleDrag",
+      "drop": "handleDrag"
     };
 
     Editor.prototype.initialize = function(opts) {
@@ -11591,6 +11594,10 @@ if ( typeof define === "function" ) {
       })(this), 10);
     };
 
+    Editor.prototype.handleDrag = function() {
+      return false;
+    };
+
     Editor.prototype.handleTextSelection = function(anchor_node) {
       var text;
       this.editor_menu.hide();
@@ -11622,11 +11629,20 @@ if ( typeof define === "function" ) {
       return $(".graf--last").html(this.body_placeholder);
     };
 
-    Editor.prototype.handleGrafFigureSelect = function(ev) {
+    Editor.prototype.handleGrafFigureSelectImg = function(ev) {
       var element;
+      utils.log("FIGURE SELECT");
       element = ev.currentTarget;
       this.markAsSelected(element);
-      return this.setRangeAt($(element).find('.imageCaption')[0]);
+      $(element).parent().addClass("is-selected is-mediaFocused");
+      return this.selection().removeAllRanges();
+    };
+
+    Editor.prototype.handleGrafFigureSelectCaption = function(ev) {
+      var element;
+      utils.log("FIGCAPTION");
+      element = ev.currentTarget;
+      return $(element).parent().removeClass("is-mediaFocused");
     };
 
     Editor.prototype.handleBlur = function(ev) {
@@ -11642,8 +11658,6 @@ if ( typeof define === "function" ) {
       var anchor_node;
       utils.log("MOUSE UP");
       anchor_node = this.getNode();
-      utils.log(anchor_node);
-      utils.log(ev.currentTarget);
       if (_.isNull(anchor_node)) {
         return;
       }
@@ -11668,36 +11682,44 @@ if ( typeof define === "function" ) {
     Editor.prototype.handleArrow = function(ev) {
       var current_node;
       current_node = $(this.getNode());
-      if (current_node) {
+      if (current_node.length > 0) {
         this.markAsSelected(current_node);
         return this.displayTooltipAt(current_node);
       }
     };
 
     Editor.prototype.handleArrowForKeyDown = function(ev) {
-      var current_node, ev_type, n, next_node, num, prev_node;
-      current_node = $(this.getNode());
+      var caret_node, current_node, ev_type, n, next_node, num, prev_node;
+      caret_node = this.getNode();
+      current_node = $(caret_node);
       utils.log(ev);
       ev_type = ev.originalEvent.key || ev.originalEvent.keyIdentifier;
       utils.log("ENTER ARROW for key " + ev_type);
       switch (ev_type) {
         case "Down":
+          if (_.isUndefined(current_node) || !current_node.exists()) {
+            if ($(".is-selected").exists()) {
+              current_node = $(".is-selected");
+            }
+          }
           next_node = current_node.next();
           utils.log("NEXT NODE IS " + (next_node.attr('class')));
           utils.log("CURRENT NODE IS " + (current_node.attr('class')));
           if (!$(current_node).hasClass("graf")) {
             return;
           }
-          if (!$(current_node).editableCaretOnLastLine()) {
+          if (!(current_node.hasClass("graf--figure") || $(current_node).editableCaretOnLastLine())) {
             return;
           }
           utils.log("ENTER ARROW PASSED RETURNS");
-          if (next_node.hasClass("graf--figure")) {
+          if (next_node.hasClass("graf--figure") && caret_node) {
             n = next_node.find(".imageCaption");
             this.setRangeAt(n[0]);
             this.scrollTo(n);
             utils.log("1 down");
             utils.log(n[0]);
+            this.skip_keyup = true;
+            this.selection().removeAllRanges();
             next_node.addClass("is-mediaFocused is-selected");
             return false;
           } else if (next_node.hasClass("graf--mixtapeEmbed")) {
@@ -11709,19 +11731,12 @@ if ( typeof define === "function" ) {
             return false;
           }
           if (current_node.hasClass("graf--figure") && next_node.hasClass("graf")) {
-            this.setRangeAt(next_node[0]);
             this.scrollTo(next_node);
-            utils.log("3 down");
+            utils.log("3 down, from figure to next graf");
+            this.markAsSelected(next_node);
+            this.setRangeAt(next_node[0]);
             return false;
           }
-
-          /*
-          else if next_node.hasClass("graf")
-            n = current_node.next(".graf")
-            @setRangeAt n[0]
-            @scrollTo(n)
-            false
-           */
           break;
         case "Up":
           prev_node = current_node.prev();
@@ -11737,8 +11752,9 @@ if ( typeof define === "function" ) {
           if (prev_node.hasClass("graf--figure")) {
             utils.log("1 up");
             n = prev_node.find(".imageCaption");
-            this.setRangeAt(n[0]);
             this.scrollTo(n);
+            this.skip_keyup = true;
+            this.selection().removeAllRanges();
             prev_node.addClass("is-mediaFocused is-selected");
             return false;
           } else if (prev_node.hasClass("graf--mixtapeEmbed")) {
@@ -11757,9 +11773,9 @@ if ( typeof define === "function" ) {
           } else if (prev_node.hasClass("graf")) {
             n = current_node.prev(".graf");
             num = n[0].childNodes.length;
-            this.setRangeAt(n[0], num);
             this.scrollTo(n);
             utils.log("4 up");
+            this.skip_keyup = true;
             return false;
           }
           return utils.log("noting");
@@ -12024,6 +12040,13 @@ if ( typeof define === "function" ) {
             return false;
           }
         }
+        utils.log("sss");
+        utils.log(anchor_node);
+        if ($(".is-selected").hasClass("graf--figure")) {
+          this.replaceWith("p", $(".is-selected"));
+          this.setRangeAt($(".is-selected")[0]);
+          return false;
+        }
       }
       if (_.contains([38, 40], e.which)) {
         utils.log(e.which);
@@ -12031,13 +12054,24 @@ if ( typeof define === "function" ) {
       }
       if (anchor_node) {
         if (!_.isEmpty($(anchor_node).text())) {
-          return this.tooltip_view.hide();
+          this.tooltip_view.hide();
+          $(anchor_node).removeClass("graf--empty");
         }
+      }
+      if (_.isUndefined(anchor_node) && $(".is-selected").hasClass("is-mediaFocused")) {
+        this.setRangeAt($(".is-selected").find("figcaption")[0]);
+        $(".is-selected").removeClass("is-mediaFocused");
+        return false;
       }
     };
 
     Editor.prototype.handleKeyUp = function(e, node) {
       var anchor_node, utils_anchor_node;
+      if (this.skip_keyup) {
+        this.skip_keyup = null;
+        utils.log("SKIP KEYUP");
+        return;
+      }
       utils.log("KEYUP");
       this.editor_menu.hide();
       this.reachedTop = false;
@@ -12076,12 +12110,7 @@ if ( typeof define === "function" ) {
         }
       }
       if (_.contains([37, 38, 39, 40], e.which)) {
-        this.handleArrow(e);
-      }
-      if (anchor_node) {
-        if (!_.isEmpty($(anchor_node).text())) {
-          return $(anchor_node).removeClass("graf--empty");
-        }
+        return this.handleArrow(e);
       }
     };
 
@@ -12093,6 +12122,14 @@ if ( typeof define === "function" ) {
       } else {
         new_paragraph.insertAfter(from_element);
       }
+      this.setRangeAt(new_paragraph[0]);
+      return this.scrollTo(new_paragraph);
+    };
+
+    Editor.prototype.replaceWith = function(element_type, from_element) {
+      var new_paragraph;
+      new_paragraph = $("<" + element_type + " class='graf graf--" + element_type + " graf--empty is-selected'><br/></" + element_type + ">");
+      from_element.replaceWith(new_paragraph);
       this.setRangeAt(new_paragraph[0]);
       return this.scrollTo(new_paragraph);
     };
@@ -12120,9 +12157,20 @@ if ( typeof define === "function" ) {
       }
       $(this.el).find(".is-selected").removeClass("is-mediaFocused is-selected");
       $(element).addClass("is-selected");
-      if ($(element).prop("tagName").toLowerCase() === "figure") {
-        $(element).addClass("is-mediaFocused");
-      }
+
+      /*
+      if $(element).prop("tagName").toLowerCase() is "figure"
+        $(element).addClass("is-mediaFocused")
+        n = utils.getNode()
+        utils.log n
+      
+        n = utils.getNode()
+        utils.log n
+        if _.isUndefined n
+          $(element).addClass("is-mediaFocused")
+        else if $(n).prop("tagName").toLowerCase() is "figcaption"
+          $(element).removeClass("is-mediaFocused")
+       */
       $(element).find(".defaultValue").remove();
       if ($(element).hasClass("graf--first")) {
         this.reachedTop = true;
@@ -12524,8 +12572,7 @@ if ( typeof define === "function" ) {
       if (n !== 0) {
         _results = [];
         for (i = _i = 0, _ref = n - 1; _i <= _ref; i = _i += 1) {
-          $("[name='" + (tmpl.attr('name')) + "']").unwrap();
-          _results.push(console.log(i));
+          _results.push($("[name='" + (tmpl.attr('name')) + "']").unwrap());
         }
         return _results;
       }
@@ -13008,7 +13055,7 @@ if ( typeof define === "function" ) {
       el = el || this.current_editor.$el[0];
       while (el !== this.current_editor.$el[0]) {
         if (el.nodeName.match(this.effectNodeReg)) {
-          nodes.push((returnAsNodeName ? el.nodeName.toUpperCase() : el));
+          nodes.push((returnAsNodeName ? el.nodeName.toLowerCase() : el));
         }
         el = el.parentNode;
       }
