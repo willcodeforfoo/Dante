@@ -431,11 +431,11 @@
       "keydown": "handleKeyDown",
       "keyup": "handleKeyUp",
       "paste": "handlePaste",
-      "click .graf--figure img": "handleGrafFigureSelectImg",
-      "click figcaption": "handleGrafFigureSelectCaption",
       "dblclick": "handleDblclick",
       "dragstart": "handleDrag",
-      "drop": "handleDrag"
+      "drop": "handleDrag",
+      "click .graf--figure .aspectRatioPlaceholder": "handleGrafFigureSelectImg",
+      "click .graf--figure figcaption": "handleGrafFigureSelectCaption"
     };
 
     Editor.prototype.initialize = function(opts) {
@@ -761,7 +761,7 @@
       utils.log("FIGURE SELECT");
       element = ev.currentTarget;
       this.markAsSelected(element);
-      $(element).parent().addClass("is-selected is-mediaFocused");
+      $(element).parent(".graf--figure").addClass("is-selected is-mediaFocused");
       return this.selection().removeAllRanges();
     };
 
@@ -769,7 +769,7 @@
       var element;
       utils.log("FIGCAPTION");
       element = ev.currentTarget;
-      return $(element).parent().removeClass("is-mediaFocused");
+      return $(element).parent(".graf--figure").removeClass("is-mediaFocused");
     };
 
     Editor.prototype.handleBlur = function(ev) {
@@ -1467,12 +1467,14 @@
               return {
                 whitelist_nodes: [input.node]
               };
-            } else if (input.node_name === 'div' && ($(input.node).hasClass("aspect-ratio-fill") && $(input.node).parent(".graf--figure").exists())) {
+            } else if (input.node_name === 'div' && ($(input.node).hasClass("aspectRatioPlaceholder") && $(input.node).parent(".graf--figure").exists())) {
               return {
                 whitelist_nodes: [input.node]
               };
-            } else if (input.node_name === 'div' && ($(input.node).hasClass("aspectRatioPlaceholder") && $(input.node).parent(".aspect-ratio-fill").exists())) {
-
+            } else if (input.node_name === 'div' && ($(input.node).hasClass("aspect-ratio-fill") && $(input.node).parent(".aspectRatioPlaceholder").exists())) {
+              return {
+                whitelist_nodes: [input.node]
+              };
             } else if (input.node_name === 'img' && $(input.node).parent(".graf--figure").exists()) {
               return {
                 whitelist_nodes: [input.node]
