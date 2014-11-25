@@ -22,11 +22,8 @@
     </div>
 
     <article>
-  <div class="postContent">
-    <div class="notesSource">
-
-      <div id="editor" class="postField postField--body editable smart-media-plugin">
-        <h1 id="dante-editor">Dante Editor</h1>
+  <div id="editor">
+    <h1 id="dante-editor">Dante Editor</h1>
 
 <h3 id="just-another-medium-editor-clone">Just another Medium editor clone.</h3>
 
@@ -53,9 +50,6 @@ We don't have any intention to target all browsers versions, really… if you li
 
 <p><a href="./license.md">Licensed under MIT.</a> 2014</p>
 
-      </div>
-
-    </div>
   </div>
 </article>
 
@@ -63,7 +57,8 @@ We don't have any intention to target all browsers versions, really… if you li
   editor = new Dante.Editor(
     {
       el: "#editor",
-      upload_url: "/uploads/new.json"
+      upload_url: "/uploads/new.json",
+      debug: true
     }
   ).start()
 </script>

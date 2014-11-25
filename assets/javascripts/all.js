@@ -11413,8 +11413,8 @@ if ( typeof define === "function" ) {
     Editor.prototype.start = function() {
       this.render();
       $(this.el).attr("contenteditable", "true");
-      $(this.el).addClass("postField--body");
-      $(this.el).wrap("<div class='notesSource'></div>");
+      $(this.el).addClass("postField postField--body editable smart-media-plugin");
+      $(this.el).wrap("<div class='postContent'><div class='notesSource'></div></div>");
       this.appendMenus();
       if (!_.isEmpty(this.initial_html.trim())) {
         this.appendInitialContent();
@@ -12237,7 +12237,7 @@ if ( typeof define === "function" ) {
         case 'u':
         case 'i':
           utils.log("links");
-          $(n).wrap("<p class='graf graf--" + name + "'></p>");
+          $(n).wrap("<p class='graf graf--p'></p>");
           n = $(n).parent();
           break;
         case "blockquote":
@@ -12528,7 +12528,8 @@ if ( typeof define === "function" ) {
 
     Tooltip.prototype.toggleOptions = function() {
       utils.log("Toggle Options!!");
-      return $(this.el).toggleClass("is-active is-scaled");
+      $(this.el).toggleClass("is-active is-scaled");
+      return false;
     };
 
     Tooltip.prototype.move = function(coords) {
@@ -12542,18 +12543,22 @@ if ( typeof define === "function" ) {
       switch (name) {
         case "inline-menu-image":
           this.placeholder = "<p>PLACEHOLDER</p>";
-          return this.imageSelect(ev);
+          this.imageSelect(ev);
+          break;
         case "inline-menu-embed":
-          return this.displayEmbedPlaceHolder();
+          this.displayEmbedPlaceHolder();
+          break;
         case "inline-menu-embed-extract":
-          return this.displayExtractPlaceHolder();
+          this.displayExtractPlaceHolder();
+          break;
         case "inline-menu-hr":
-          return this.splitSection();
+          this.splitSection();
       }
+      return false;
     };
 
     Tooltip.prototype.uploadExistentImage = function(image_element, opts) {
-      var i, img, n, node, tmpl, _i, _ref, _results;
+      var i, img, n, node, tmpl, _i, _ref;
       if (opts == null) {
         opts = {};
       }
@@ -12577,12 +12582,12 @@ if ( typeof define === "function" ) {
       this.replaceImg(image_element, $("[name='" + (tmpl.attr('name')) + "']"));
       n = $("[name='" + (tmpl.attr('name')) + "']").parentsUntil(".section-inner").length;
       if (n !== 0) {
-        _results = [];
         for (i = _i = 0, _ref = n - 1; _i <= _ref; i = _i += 1) {
-          _results.push($("[name='" + (tmpl.attr('name')) + "']").unwrap());
+          $("[name='" + (tmpl.attr('name')) + "']").unwrap();
         }
-        return _results;
       }
+      utils.log("FIG");
+      return utils.log($("[name='" + (tmpl.attr('name')) + "']"));
     };
 
     Tooltip.prototype.replaceImg = function(image_element, figure) {
@@ -12607,9 +12612,10 @@ if ( typeof define === "function" ) {
           "data-height": this.height,
           "data-width": this.width
         });
-        return figure.find(".aspect-ratio-fill").css({
+        figure.find(".aspect-ratio-fill").css({
           "padding-bottom": "" + ar.ratio + "%"
         });
+        return utils.log(figure);
       };
       return figure.find("img").attr("src", image_element.src);
     };
