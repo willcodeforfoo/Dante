@@ -13122,7 +13122,7 @@ if ( typeof define === "function" ) {
               utils.log("nothing to select");
           }
           if (tag.match(/(?:h[1-6])/i)) {
-            $(_this.el).find(".icon-bold, .icon-italic, .icon-blockquote").parent("li").hide();
+            $(_this.el).find(".icon-bold, .icon-italic, .icon-blockquote").parent("li").remove();
           }
           return _this.highlight(tag);
         };
