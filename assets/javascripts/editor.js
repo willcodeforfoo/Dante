@@ -447,17 +447,18 @@
       this.current_range = null;
       this.current_node = null;
       this.el = opts.el || "#editor";
-      window.debugMode = opts.debug || false;
-      if (window.debugMode) {
-        $(this.el).addClass("debug");
-      }
       this.upload_url = opts.upload_url || "/uploads.json";
       this.oembed_url = opts.oembed_url || "http://api.embed.ly/1/oembed?url=";
       this.extract_url = opts.extract_url || "http://api.embed.ly/1/extract?key=86c28a410a104c8bb58848733c82f840&url=";
       this.default_loading_placeholder = opts.default_loading_placeholder || Dante.defaults.image_placeholder;
       this.store_url = opts.store_url;
       this.spell_check = opts.spellcheck || false;
+      this.disable_title = opts.disable_title || false;
       this.store_interval = opts.store_interval || 15000;
+      window.debugMode = opts.debug || false;
+      if (window.debugMode) {
+        $(this.el).addClass("debug");
+      }
       if (localStorage.getItem('contenteditable')) {
         $(this.el).html(localStorage.getItem('contenteditable'));
       }
@@ -507,8 +508,12 @@
       return $(this.el).find(".section-inner").html();
     };
 
+    Editor.prototype.renderTitle = function() {
+      return "<h3 class='graf graf--h3'>" + this.title_placeholder + " </h3>";
+    };
+
     Editor.prototype.template = function() {
-      return "<section class='section--first section--last'> <div class='section-divider layoutSingleColumn'> <hr class='section-divider'> </div> <div class='section-content'> <div class='section-inner'> <h3 class='graf graf--h3'>" + this.title_placeholder + "</h3> <p class='graf graf--p'>" + this.body_placeholder + "<p> </div> </div> </section>";
+      return "<section class='section--first section--last'> <div class='section-divider layoutSingleColumn'> <hr class='section-divider'> </div> <div class='section-content'> <div class='section-inner'> " + (this.disable_title ? '' : this.renderTitle()) + " <p class='graf graf--p'>" + this.body_placeholder + "<p> </div> </div> </section>";
     };
 
     Editor.prototype.baseParagraphTmpl = function() {
