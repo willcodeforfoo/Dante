@@ -546,7 +546,6 @@
       if (!_.isEmpty(this.initial_html.trim())) {
         this.appendInitialContent();
       }
-      this.setupElementsClasses();
       return this.parseInitialMess();
     };
 
@@ -734,7 +733,7 @@
       var text;
       this.editor_menu.hide();
       text = this.getSelectedText();
-      if (!_.isEmpty(text.trim())) {
+      if (!$(anchor_node).is(".graf--mixtapeEmbed, .graf--figure") && !_.isEmpty(text.trim())) {
         this.current_node = anchor_node;
         return this.displayMenu();
       }
@@ -915,7 +914,11 @@
     };
 
     Editor.prototype.parseInitialMess = function() {
-      return this.handleUnwrappedImages($(this.el).find('.section-inner'));
+      return this.setupElementsClasses($(this.el).find('.section-inner'), (function(_this) {
+        return function() {
+          return _this.handleUnwrappedImages($(_this.el).find('.section-inner'));
+        };
+      })(this));
     };
 
     Editor.prototype.handleDblclick = function() {
@@ -1699,13 +1702,16 @@
         utils.log("UNO");
         tmpl.insertBefore($(image_element).parents(".graf"));
         node = this.current_editor.getNode();
-        this.current_editor.preCleanNode($(node));
-        this.current_editor.addClassesToElement(node);
+        if (node) {
+          this.current_editor.preCleanNode($(node));
+          this.current_editor.addClassesToElement(node);
+        }
       } else {
         utils.log("DOS");
         img = $(image_element).parentsUntil(".section-inner").first();
         $(img).replaceWith(tmpl);
       }
+      utils.log($("[name='" + (tmpl.attr('name')) + "']").attr("name"));
       this.replaceImg(image_element, $("[name='" + (tmpl.attr('name')) + "']"));
       n = $("[name='" + (tmpl.attr('name')) + "']").parentsUntil(".section-inner").length;
       if (n !== 0) {
@@ -1713,8 +1719,7 @@
           $("[name='" + (tmpl.attr('name')) + "']").unwrap();
         }
       }
-      utils.log("FIG");
-      return utils.log($("[name='" + (tmpl.attr('name')) + "']"));
+      return utils.log("FIG");
     };
 
     Tooltip.prototype.replaceImg = function(image_element, figure) {
@@ -1725,10 +1730,10 @@
       img = new Image();
       img.src = image_element.src;
       self = this;
-      img.onload = function() {
+      return img.onload = function() {
         var ar;
         utils.log("replace image with loaded info");
-        utils.log(figure);
+        utils.log(figure.attr("name"));
         utils.log(this.width + 'x' + this.height);
         ar = self.getAspectRatio(this.width, this.height);
         figure.find(".aspectRatioPlaceholder").css({
@@ -1742,9 +1747,8 @@
         figure.find(".aspect-ratio-fill").css({
           "padding-bottom": "" + ar.ratio + "%"
         });
-        return utils.log(figure);
+        return figure.find("img").attr("src", image_element.src);
       };
-      return figure.find("img").attr("src", image_element.src);
     };
 
     Tooltip.prototype.displayAndUploadImages = function(file) {
@@ -1801,7 +1805,7 @@
     };
 
     Tooltip.prototype.getAspectRatio = function(w, h) {
-      var height, maxHeight, maxWidth, ratio, result, width;
+      var fill_ratio, height, maxHeight, maxWidth, ratio, result, width;
       maxWidth = 700;
       maxHeight = 700;
       ratio = 0;
@@ -1811,17 +1815,16 @@
         ratio = maxWidth / width;
         height = height * ratio;
         width = width * ratio;
-      }
-      if (height > maxHeight) {
+      } else if (height > maxHeight) {
         ratio = maxHeight / height;
         width = width * ratio;
         height = height * ratio;
       }
-      ratio = height / maxHeight * 100;
+      fill_ratio = height / width * 100;
       result = {
         width: width,
         height: height,
-        ratio: ratio
+        ratio: fill_ratio
       };
       utils.log(result);
       return result;
