@@ -2,12 +2,13 @@
   window.Dante = {
     Editor: {
       ToolTip: {},
+      PopOver: {},
       Menu: {}
     },
     defaults: {
       image_placeholder: '../images/dante/media-loading-placeholder.png'
     },
-    version: "0.0.3"
+    version: "0.0.4"
   };
 
 }).call(this);
@@ -395,12 +396,10 @@
 
 }).call(this);
 (function() {
-  var selected_menu, utils,
+  var utils,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  selected_menu = false;
 
   utils = Dante.utils;
 
@@ -414,7 +413,6 @@
       this.handleArrowForKeyDown = __bind(this.handleArrowForKeyDown, this);
       this.handleArrow = __bind(this.handleArrow, this);
       this.handleMouseUp = __bind(this.handleMouseUp, this);
-      this.handleBlur = __bind(this.handleBlur, this);
       this.selection = __bind(this.selection, this);
       this.render = __bind(this.render, this);
       this.restart = __bind(this.restart, this);
@@ -435,7 +433,9 @@
       "dragstart": "handleDrag",
       "drop": "handleDrag",
       "click .graf--figure .aspectRatioPlaceholder": "handleGrafFigureSelectImg",
-      "click .graf--figure figcaption": "handleGrafFigureSelectCaption"
+      "click .graf--figure figcaption": "handleGrafFigureSelectCaption",
+      "mouseover .markup--anchor": "displayPopOver",
+      "mouseout  .markup--anchor": "hidePopOver"
     };
 
     Editor.prototype.initialize = function(opts) {
@@ -529,6 +529,10 @@
       this.tooltip_view = new Dante.Editor.Tooltip({
         editor: this
       });
+      this.pop_over = new Dante.Editor.PopOver({
+        editor: this
+      });
+      this.pop_over.render().hide();
       return this.tooltip_view.render().hide();
     };
 
@@ -541,7 +545,7 @@
       this.render();
       $(this.el).attr("contenteditable", "true");
       $(this.el).addClass("postField postField--body editable smart-media-plugin");
-      $(this.el).wrap("<div class='postContent'><div class='notesSource'></div></div>");
+      $(this.el).wrap("<article class='postArticle'><div class='postContent'><div class='notesSource'></div></div></article>");
       this.appendMenus();
       if (!_.isEmpty(this.initial_html.trim())) {
         this.appendInitialContent();
@@ -760,6 +764,14 @@
       return $(".graf--last").html(this.body_placeholder);
     };
 
+    Editor.prototype.displayPopOver = function(ev) {
+      return this.pop_over.displayAt(ev);
+    };
+
+    Editor.prototype.hidePopOver = function(ev) {
+      return this.pop_over.hide(ev);
+    };
+
     Editor.prototype.handleGrafFigureSelectImg = function(ev) {
       var element;
       utils.log("FIGURE SELECT");
@@ -774,15 +786,6 @@
       utils.log("FIGCAPTION");
       element = ev.currentTarget;
       return $(element).parent(".graf--figure").removeClass("is-mediaFocused");
-    };
-
-    Editor.prototype.handleBlur = function(ev) {
-      setTimeout((function(_this) {
-        return function() {
-          return utils.log("not in use");
-        };
-      })(this), 200);
-      return false;
     };
 
     Editor.prototype.handleMouseUp = function(ev) {
@@ -909,7 +912,6 @@
             this.skip_keyup = true;
             return false;
           }
-          return utils.log("noting");
       }
     };
 
@@ -942,6 +944,7 @@
         cbd = ev.originalEvent.clipboardData;
         pastedText = _.isEmpty(cbd.getData('text/html')) ? cbd.getData('text/plain') : cbd.getData('text/html');
       }
+      utils.log(pastedText);
       if (pastedText.match(/<\/*[a-z][^>]+?>/gi)) {
         utils.log("HTML DETECTED ON PASTE");
         $(pastedText);
@@ -1113,7 +1116,7 @@
         this.tooltip_view.cleanOperationClasses($(anchor_node));
         if (anchor_node && this.editor_menu.lineBreakReg.test(anchor_node.nodeName)) {
           if (this.isLastChar()) {
-            utils.log("new paragraph if it the last character");
+            utils.log("new paragraph if it's the last character");
             e.preventDefault();
             this.handleLineBreakWith("p", parent);
           }
@@ -1122,9 +1125,12 @@
           return function() {
             var node;
             node = _this.getNode();
-            _this.markAsSelected(_this.getNode());
-            _this.setupFirstAndLast();
             _this.setElementName($(node));
+            if (node.nodeName.toLowerCase() === "div") {
+              node = _this.replaceWith("p", $(node))[0];
+            }
+            _this.markAsSelected($(node));
+            _this.setupFirstAndLast();
             if (_.isEmpty($(node).text().trim())) {
               _.each($(node).children(), function(n) {
                 return $(n).remove();
@@ -1175,7 +1181,6 @@
             return false;
           }
         }
-        utils.log("sss");
         utils.log(anchor_node);
         if ($(".is-selected").hasClass("graf--figure")) {
           this.replaceWith("p", $(".is-selected"));
@@ -1266,7 +1271,8 @@
       new_paragraph = $("<" + element_type + " class='graf graf--" + element_type + " graf--empty is-selected'><br/></" + element_type + ">");
       from_element.replaceWith(new_paragraph);
       this.setRangeAt(new_paragraph[0]);
-      return this.scrollTo(new_paragraph);
+      this.scrollTo(new_paragraph);
+      return new_paragraph;
     };
 
     Editor.prototype.displayTooltipAt = function(element) {
@@ -1292,20 +1298,6 @@
       }
       $(this.el).find(".is-selected").removeClass("is-mediaFocused is-selected");
       $(element).addClass("is-selected");
-
-      /*
-      if $(element).prop("tagName").toLowerCase() is "figure"
-        $(element).addClass("is-mediaFocused")
-        n = utils.getNode()
-        utils.log n
-      
-        n = utils.getNode()
-        utils.log n
-        if _.isUndefined n
-          $(element).addClass("is-mediaFocused")
-        else if $(n).prop("tagName").toLowerCase() is "figcaption"
-          $(element).removeClass("is-mediaFocused")
-       */
       $(element).find(".defaultValue").remove();
       if ($(element).hasClass("graf--first")) {
         this.reachedTop = true;
@@ -1998,6 +1990,83 @@
 }).call(this);
 (function() {
   var utils,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  utils = Dante.utils;
+
+  Dante.Editor.PopOver = (function(_super) {
+    __extends(PopOver, _super);
+
+    function PopOver() {
+      return PopOver.__super__.constructor.apply(this, arguments);
+    }
+
+    PopOver.prototype.el = "body";
+
+    PopOver.prototype.events = {
+      "mouseover .popover": "cancelHide",
+      "mouseout  .popover": "hide"
+    };
+
+    PopOver.prototype.initialize = function(opts) {
+      if (opts == null) {
+        opts = {};
+      }
+      utils.log("initialized popover");
+      this.editor = opts.editor;
+      this.hideTimeout;
+      return this.settings = {
+        timeout: 300
+      };
+    };
+
+    PopOver.prototype.template = function() {
+      return "<div class='popover popover--tooltip popover--Linktooltip popover--bottom is-active'> <div class='popover-inner'> <a href='#' target='_blank'> Link </a> </div> <div class='popover-arrow'> </div> </div>";
+    };
+
+    PopOver.prototype.displayAt = function(ev) {
+      var offset, popover_w, pos, rect, target;
+      this.cancelHide();
+      target = $(ev.currentTarget);
+      $(this.el).find(".popover-inner a").text(target.attr('href')).attr('href', target.attr("href"));
+      pos = target.position();
+      offset = target.offset();
+      rect = ev.currentTarget.getBoundingClientRect();
+      popover_w = $(this.el).find(".popover").width();
+      utils.log(pos);
+      utils.log(rect);
+      utils.log(popover_w);
+      $(this.el).find(".popover").css("top", pos.top + rect.height).css("left", pos.left + (rect.width / 2) - (popover_w / 2)).show();
+      $(this.el).find(".popover--tooltip").css("pointer-events", "auto");
+      return $(this.el).show();
+    };
+
+    PopOver.prototype.cancelHide = function() {
+      utils.log("Cancel Hide");
+      return clearTimeout(this.hideTimeout);
+    };
+
+    PopOver.prototype.hide = function(ev) {
+      this.cancelHide();
+      return this.hideTimeout = setTimeout((function(_this) {
+        return function() {
+          return $(_this.el).find(".popover").hide();
+        };
+      })(this), this.settings.timeout);
+    };
+
+    PopOver.prototype.render = function() {
+      return $(this.template()).insertAfter(this.editor.$el);
+    };
+
+    return PopOver;
+
+  })(Dante.View);
+
+}).call(this);
+(function() {
+  var utils,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -2021,8 +2090,6 @@
     Menu.prototype.events = {
       "mousedown li": "handleClick",
       "click .dante-menu-linkinput .dante-menu-button": "closeInput",
-      "mouseenter": "handleOver",
-      "mouseleave": "handleOut",
       "keypress input": "handleInputEnter"
     };
 
@@ -2205,16 +2272,6 @@
       return nodes;
     };
 
-    Menu.prototype.handleOut = function() {
-      var selected_menu;
-      return selected_menu = false;
-    };
-
-    Menu.prototype.handleOver = function() {
-      var selected_menu;
-      return selected_menu = true;
-    };
-
     Menu.prototype.displayHighlights = function() {
       var nodes;
       $(this.el).find(".active").removeClass("active");
@@ -2278,6 +2335,7 @@
 
 }).call(this);
 //Editor components
+
 
 
 

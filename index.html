@@ -21,9 +21,8 @@
       <a class="github tooltip-left" data-tooltip="Fork me on github" href="https://github.com/michelson/dante"><i class="fa fa-github"></i></a>
     </div>
 
-    <article>
-  <div id="editor">
-    <h1 id="dante-editor">Dante Editor</h1>
+    <div id="editor">
+  <h1 id="dante-editor">Dante Editor</h1>
 
 <h3 id="just-another-medium-editor-clone">Just another Medium editor clone.</h3>
 
@@ -50,16 +49,17 @@ We don't have any intention to target all browsers versions, really… if you li
 
 <p><a href="./license.md">Licensed under MIT.</a> 2014</p>
 
-  </div>
-</article>
+</div>
 
 <script type="text/javascript">
   editor = new Dante.Editor(
     {
       el: "#editor",
-      upload_url: "/uploads/new.json"
+      upload_url: "/uploads/new.json",
+      debug: false
     }
-  ).start()
+  )
+  editor.start()
 </script>
 
   </body>
