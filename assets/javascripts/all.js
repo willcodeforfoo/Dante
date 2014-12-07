@@ -11721,12 +11721,12 @@ if ( typeof define === "function" ) {
           utils.log("ENTER ARROW PASSED RETURNS");
           if (next_node.hasClass("graf--figure") && caret_node) {
             n = next_node.find(".imageCaption");
-            this.setRangeAt(n[0]);
             this.scrollTo(n);
             utils.log("1 down");
             utils.log(n[0]);
             this.skip_keyup = true;
             this.selection().removeAllRanges();
+            this.markAsSelected(next_node);
             next_node.addClass("is-mediaFocused is-selected");
             return false;
           } else if (next_node.hasClass("graf--mixtapeEmbed")) {
@@ -11762,7 +11762,8 @@ if ( typeof define === "function" ) {
             this.scrollTo(n);
             this.skip_keyup = true;
             this.selection().removeAllRanges();
-            prev_node.addClass("is-mediaFocused is-selected");
+            this.markAsSelected(prev_node);
+            prev_node.addClass("is-mediaFocused");
             return false;
           } else if (prev_node.hasClass("graf--mixtapeEmbed")) {
             n = current_node.prev(".graf--mixtapeEmbed");
@@ -11783,6 +11784,7 @@ if ( typeof define === "function" ) {
             this.scrollTo(n);
             utils.log("4 up");
             this.skip_keyup = true;
+            this.markAsSelected(prev_node);
             return false;
           }
       }
@@ -12083,7 +12085,7 @@ if ( typeof define === "function" ) {
       if (this.skip_keyup) {
         this.skip_keyup = null;
         utils.log("SKIP KEYUP");
-        return;
+        return false;
       }
       utils.log("KEYUP");
       this.editor_menu.hide();
