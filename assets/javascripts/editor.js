@@ -434,6 +434,7 @@
       "drop": "handleDrag",
       "click .graf--figure .aspectRatioPlaceholder": "handleGrafFigureSelectImg",
       "click .graf--figure figcaption": "handleGrafFigureSelectCaption",
+      "keyup .graf--figure figcaption": "handleGrafCaptionTyping",
       "mouseover .markup--anchor": "displayPopOver",
       "mouseout  .markup--anchor": "hidePopOver"
     };
@@ -731,6 +732,14 @@
 
     Editor.prototype.handleDrag = function() {
       return false;
+    };
+
+    Editor.prototype.handleGrafCaptionTyping = function(ev) {
+      if (_.isEmpty(utils.getNode().textContent.trim())) {
+        return $(this.getNode()).addClass("is-defaultValue");
+      } else {
+        return $(this.getNode()).removeClass("is-defaultValue");
+      }
     };
 
     Editor.prototype.handleTextSelection = function(anchor_node) {
