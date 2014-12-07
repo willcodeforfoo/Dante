@@ -2036,19 +2036,25 @@
       return "<div class='popover popover--tooltip popover--Linktooltip popover--bottom is-active'> <div class='popover-inner'> <a href='#' target='_blank'> Link </a> </div> <div class='popover-arrow'> </div> </div>";
     };
 
+    PopOver.prototype.positionAt = function(ev) {
+      var left_value, popover_width, target, target_height, target_offset, target_positions, target_width, top_value;
+      target = $(ev.currentTarget);
+      target_positions = target.position();
+      target_offset = target.offset();
+      target_width = target.outerWidth();
+      target_height = target.outerHeight();
+      popover_width = $(this.el).find(".popover").outerWidth();
+      top_value = target_positions.top + target_height;
+      left_value = target_offset.left + (target_width / 2) - (popover_width / 2);
+      return $(this.el).find(".popover").css("top", top_value).css("left", left_value).show();
+    };
+
     PopOver.prototype.displayAt = function(ev) {
-      var offset, popover_w, pos, rect, target;
+      var target;
       this.cancelHide();
       target = $(ev.currentTarget);
       $(this.el).find(".popover-inner a").text(target.attr('href')).attr('href', target.attr("href"));
-      pos = target.position();
-      offset = target.offset();
-      rect = ev.currentTarget.getBoundingClientRect();
-      popover_w = $(this.el).find(".popover").width();
-      utils.log(pos);
-      utils.log(rect);
-      utils.log(popover_w);
-      $(this.el).find(".popover").css("top", pos.top + rect.height).css("left", pos.left + (rect.width / 2) - (popover_w / 2)).show();
+      this.positionAt(ev);
       $(this.el).find(".popover--tooltip").css("pointer-events", "auto");
       return $(this.el).show();
     };
