@@ -63,7 +63,23 @@
     -webkit-transform: matrix(1, 0, 0, 1, 0, 0);
     transform: matrix(1, 0, 0, 1, 0, 0);
     opacity: 1; } }
-/* line 1, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_post.scss */
+/* line 3, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_post.scss */
+.postArticle .layoutSingleColumn {
+  width: 700px;
+  margin-left: auto;
+  margin-right: auto; }
+@media (max-width: 800px) {
+  /* line 2, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_post.scss */
+  .postArticle .layoutSingleColumn {
+    width: 640px; } }
+@media (max-width: 680px) {
+  /* line 2, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_post.scss */
+  .postArticle .layoutSingleColumn {
+    width: auto;
+    margin-left: 20px;
+    margin-right: 20px; } }
+
+/* line 19, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_post.scss */
 .postContent {
   font-family: "freight-text-pro", "Merriweather", Georgia, Cambria, "Times New Roman", Times, serif;
   letter-spacing: 0.01rem;
@@ -73,13 +89,13 @@
   letter-spacing: 0.01rem;
   line-height: 1.69; }
 
-/* line 14, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_post.scss */
+/* line 32, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_post.scss */
 .postField, .postField:focus {
   outline: 0;
   word-break: break-word;
   word-wrap: break-word; }
 
-/* line 21, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_post.scss */
+/* line 39, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_post.scss */
 .postField--body {
   *zoom: 1;
   margin-bottom: 30px; }
@@ -91,7 +107,7 @@
   .postField--body:after {
     clear: both; }
 
-/* line 26, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_post.scss */
+/* line 44, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_post.scss */
 .section-content {
   *zoom: 1; }
   /* line 2, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_utilities.scss */
@@ -892,16 +908,6 @@ figure.is-defaultValue .imageCaption,
 section:first-child > .section-divider,
 section.is-backgrounded + section > .section-divider {
   display: none; }
-
-/* line 191, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_needsorder.scss */
-.postArticle .layoutSingleColumn,
-.postFooter--loggedOut .layoutSingleColumn {
-  width: 700px; }
-
-/* line 196, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_needsorder.scss */
-.layoutSingleColumn {
-  margin: 0 auto;
-  width: 640px; }
 
 /* line 201, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_needsorder.scss */
 .defaultValue--prompt {
