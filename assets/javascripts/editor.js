@@ -2169,8 +2169,12 @@
       utils.log("menu " + action + " item clicked!");
       this.savedSel = utils.saveSelection();
       if (/(?:createlink)/.test(action)) {
-        $(this.el).addClass("dante-menu--linkmode");
-        input.focus();
+        if ($(ev.currentTarget).hasClass("active")) {
+          this.removeLink();
+        } else {
+          $(this.el).addClass("dante-menu--linkmode");
+          input.focus();
+        }
       } else {
         this.menuApply(action);
       }
@@ -2187,6 +2191,13 @@
         utils.restoreSelection(this.savedSel);
         return this.createlink($(e.target));
       }
+    };
+
+    Menu.prototype.removeLink = function() {
+      var elem;
+      this.menuApply("unlink");
+      elem = this.current_editor.getNode();
+      return this.current_editor.cleanContents($(elem));
     };
 
     Menu.prototype.createlink = function(input) {
@@ -2339,6 +2350,7 @@
 
     Menu.prototype.show = function() {
       $(this.el).addClass("dante-menu--active");
+      this.closeInput();
       return this.displayHighlights();
     };
 
