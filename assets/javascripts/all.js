@@ -10881,7 +10881,7 @@ if ( typeof define === "function" ) {
     defaults: {
       image_placeholder: '../images/dante/media-loading-placeholder.png'
     },
-    version: "0.0.4"
+    version: "0.0.5"
   };
 
 }).call(this);
@@ -12090,7 +12090,7 @@ if ( typeof define === "function" ) {
     };
 
     Editor.prototype.handleKeyUp = function(e, node) {
-      var anchor_node, utils_anchor_node;
+      var anchor_node, next_graf, utils_anchor_node;
       if (this.skip_keyup) {
         this.skip_keyup = null;
         utils.log("SKIP KEYUP");
@@ -12114,6 +12114,12 @@ if ( typeof define === "function" ) {
         if ($(utils_anchor_node).hasClass("section-content") || $(utils_anchor_node).hasClass("graf--first")) {
           utils.log("SECTION DETECTED FROM KEYUP " + (_.isEmpty($(utils_anchor_node).text())));
           if (_.isEmpty($(utils_anchor_node).text())) {
+            next_graf = $(utils_anchor_node).next(".graf")[0];
+            if (next_graf) {
+              this.setRangeAt(next_graf);
+              $(utils_anchor_node).remove();
+              this.setupFirstAndLast();
+            }
             return false;
           }
         }
@@ -12123,14 +12129,13 @@ if ( typeof define === "function" ) {
         }
         if ($(anchor_node).hasClass("graf--first")) {
           utils.log("THE FIRST ONE! UP");
+          if (this.getSelectedText() === this.getNode().textContent) {
+            utils.log("remove selection dectected");
+            this.getNode().innerHTML = "<br>";
+          }
           this.markAsSelected(anchor_node);
           this.setupFirstAndLast();
           false;
-        }
-        if (anchor_node) {
-          this.markAsSelected(anchor_node);
-          this.setupFirstAndLast();
-          this.displayTooltipAt($(this.el).find(".is-selected"));
         }
       }
       if (_.contains([37, 38, 39, 40], e.which)) {
@@ -12912,14 +12917,15 @@ if ( typeof define === "function" ) {
     PopOver.prototype.positionAt = function(ev) {
       var left_value, popover_width, target, target_height, target_offset, target_positions, target_width, top_value;
       target = $(ev.currentTarget);
-      target_positions = target.position();
+      target_positions = this.resolveTargetPosition(target);
       target_offset = target.offset();
       target_width = target.outerWidth();
       target_height = target.outerHeight();
       popover_width = $(this.el).find(".popover").outerWidth();
       top_value = target_positions.top + target_height;
       left_value = target_offset.left + (target_width / 2) - (popover_width / 2);
-      return $(this.el).find(".popover").css("top", top_value).css("left", left_value).show();
+      $(this.el).find(".popover").css("top", top_value).css("left", left_value).show();
+      return this.handleDirection(target);
     };
 
     PopOver.prototype.displayAt = function(ev) {
@@ -12944,6 +12950,22 @@ if ( typeof define === "function" ) {
           return $(_this.el).find(".popover").hide();
         };
       })(this), this.settings.timeout);
+    };
+
+    PopOver.prototype.resolveTargetPosition = function(target) {
+      if (target.parents(".graf--mixtapeEmbed").exists()) {
+        return target.parents(".graf--mixtapeEmbed").position();
+      } else {
+        return target.position();
+      }
+    };
+
+    PopOver.prototype.handleDirection = function(target) {
+      if (target.parents(".graf--mixtapeEmbed").exists()) {
+        return $(this.el).find(".popover").removeClass("popover--bottom").addClass("popover--top");
+      } else {
+        return $(this.el).find(".popover").removeClass("popover--top").addClass("popover--bottom");
+      }
     };
 
     PopOver.prototype.render = function() {

@@ -687,26 +687,26 @@
 .graf--h4 + .graf--h3 {
   margin-top: -2px; }
 
-/* line 86, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
+/* line 84, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
 .graf--h2 + .postList,
 .graf--h3 + .postList,
 .graf--h4 + .postList {
   margin-top: 10px; }
 
-/* line 92, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
+/* line 90, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
 .graf--h2 + .graf--p.graf--empty,
 .graf--h3 + .graf--p.graf--empty,
 .graf--h4 + .graf--p.graf--empty {
   margin-bottom: -7px;
   margin-top: -7px; }
 
-/* line 99, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
+/* line 97, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
 .graf--h2 + .graf--p.graf--empty + .graf--h2,
 .graf--h3 + .graf--p.graf--empty + .graf--h2,
 .graf--h4 + .graf--p.graf--empty + .graf--h2 {
   margin-top: -5px; }
 
-/* line 105, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
+/* line 103, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
 .graf--h2 + .graf--p.graf--empty + .graf--h3,
 .graf--h3 + .graf--p.graf--empty + .graf--h3,
 .graf--h4 + .graf--p.graf--empty + .graf--h3,
@@ -715,7 +715,7 @@
 .graf--h4 + .graf--p.graf--empty + .graf--h4 {
   margin-top: -8px; }
 
-/* line 114, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
+/* line 113, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
 .graf--blockquote {
   font-family: "freight-text-pro", "Merriweather", Georgia, Cambria, "Times New Roman", Times, serif;
   border-left: 3px solid rgba(0, 0, 0, 0.8);
@@ -726,12 +726,12 @@
   padding-bottom: 3px;
   padding-left: 20px; }
 
-/* line 124, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
+/* line 123, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
 .graf--blockquote + .graf--blockquote {
   margin-top: -30px;
   padding-top: 30px; }
 
-/* line 129, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
+/* line 128, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
 .graf--pullquote {
   line-height: 1.4;
   text-align: center;
@@ -746,7 +746,7 @@
   -webkit-transition: margin 100ms;
   transition: margin 100ms; }
 
-/* line 144, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
+/* line 143, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
 .graf--pre {
   background: none repeat scroll 0 0 rgba(0, 0, 0, 0.05);
   font-family: Menlo, Monaco, Consolas, "Courier New", "Courier", monospace;
@@ -755,38 +755,37 @@
   padding: 20px;
   white-space: pre-wrap; }
 
-/* line 152, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
+/* line 151, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
 .graf--pre + .graf--pre {
   margin-top: -20px; }
 
-/* line 157, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
+/* line 156, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
 .graf--figure {
   box-sizing: border-box;
   clear: both;
   margin-bottom: 30px;
   outline: medium none;
   position: relative; }
-/* line 164, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
+/* line 163, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
 .graf--figure.is-mediaFocused .graf-image, .graf--figure.is-mediaFocused iframe {
   box-shadow: 0 0 0 3px #57ad68; }
 
 /* line 170, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
+.graf--mixtapeEmbed a {
+  text-decoration: none; }
+
+/* line 175, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
 .graf--h4 + .graf--figure,
 .graf--h3 + .graf--figure,
 .graf--h2 + .graf--figure {
   margin-top: 15px; }
 
-/* line 177, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
+/* line 181, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
 .graf--first {
   margin-top: 0;
   padding-top: 0; }
 
-/* line 182, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
-.graf--empty {
-  margin-bottom: -7px;
-  margin-top: -7px; }
-
-/* line 187, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
+/* line 186, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
 p[data-align="center"],
 .graf--h2[data-align="center"],
 .graf--h3[data-align="center"],
@@ -794,32 +793,32 @@ p[data-align="center"],
 .graf--blockquote[data-align="center"] {
   text-align: center; }
 
-/* line 195, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
+/* line 194, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
 .markup--anchor,
 .graf--sectionCaption {
   cursor: text; }
 
-/* line 199, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
+/* line 198, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
 .markup--anchor {
   text-decoration: underline;
   color: inherit; }
 
 @media (max-width: 500px) {
-  /* line 206, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
+  /* line 205, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
   .graf--h2 {
     font-size: 36px;
     line-height: 1.1;
     padding-top: 12px;
     margin-bottom: 6px; }
 
-  /* line 212, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
+  /* line 211, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
   .graf--h3 {
     font-size: 26px;
     line-height: 1.2;
     margin-top: 18px;
     margin-bottom: 4px; }
 
-  /* line 218, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
+  /* line 217, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/app/assets/stylesheets/dante/_graf.scss */
   .graf--h4 {
     font-size: 24px;
     line-height: 1.2;
