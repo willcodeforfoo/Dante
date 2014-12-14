@@ -207,7 +207,7 @@
   margin-left: 0;
   margin-bottom: -16px; }
 
-/* line 9, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/all.css.scss */
+/* line 4, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/_layout.scss */
 #header {
   display: block;
   z-index: 500;
@@ -227,17 +227,17 @@
   background: rgba(255, 255, 255, 0.97);
   box-shadow: 0 0 1px rgba(0, 0, 0, 0.15); }
 
-/* line 29, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/all.css.scss */
+/* line 24, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/_layout.scss */
 article {
   margin-top: 140px; }
 
-/* line 34, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/all.css.scss */
+/* line 29, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/_layout.scss */
 .logo {
   display: inline-block; }
-/* line 37, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/all.css.scss */
+/* line 32, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/_layout.scss */
 .logo img {
   margin: 22px 14px 22px 20px; }
-/* line 40, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/all.css.scss */
+/* line 35, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/_layout.scss */
 .logo span {
   vertical-align: top;
   border-left: 1px solid rgba(0, 0, 0, 0.15);
@@ -245,15 +245,9 @@ article {
   margin: 20px 0;
   display: inline-block; }
 
-/* line 50, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/all.css.scss */
+/* line 45, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/_layout.scss */
 .github {
   float: right;
-  font-size: 32px;
-  color: #1abf89;
   line-height: 0;
   margin-top: 19px;
-  margin-right: 24px; }
-/* line 58, /Users/michelsonmartinez/Documents/rubyonrails/medium-editor/source/assets/stylesheets/all.css.scss */
-.github i {
-  position: relative;
-  top: -2px; }
+  margin-right: 20px; }

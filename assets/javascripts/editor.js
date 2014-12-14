@@ -1300,12 +1300,9 @@
       if (!_.isEmpty($(element).text())) {
         return;
       }
-      this.position = $(element).offset();
+      this.positions = $(element).offset();
       this.tooltip_view.render();
-      return this.tooltip_view.move({
-        left: this.position.left - 60,
-        top: this.position.top - 1
-      });
+      return this.tooltip_view.move(this.positions);
     };
 
     Editor.prototype.markAsSelected = function(element) {
@@ -1621,15 +1618,15 @@
       this.current_editor = opts.editor;
       return this.buttons = [
         {
-          icon: "fa-camera",
+          icon: "icon-image",
           title: "Add an image",
           action: "image"
         }, {
-          icon: "fa-play",
+          icon: "icon-video",
           title: "Add a video",
           action: "embed"
         }, {
-          icon: "fa-code",
+          icon: "icon-embed",
           title: "Add an embed",
           action: "embed-extract"
         }
@@ -1642,9 +1639,9 @@
       _.each(this.buttons, function(b) {
         var data_action_value;
         data_action_value = b.action_value ? "data-action-value='" + b.action_value + "'" : "";
-        return menu += "<button class='inlineTooltip-button scale' title='" + b.title + "' data-action='inline-menu-" + b.action + "' " + data_action_value + "> <span class='fa " + b.icon + "'></span> </button>";
+        return menu += "<button class='inlineTooltip-button scale' title='" + b.title + "' data-action='inline-menu-" + b.action + "' " + data_action_value + "> <span class='tooltip-icon " + b.icon + "'></span> </button>";
       });
-      return "<button class='inlineTooltip-button control' title='Close Menu' data-action='inline-menu'> <span class='fa fa-plus'></span> </button> <div class='inlineTooltip-menu'> " + menu + " </div>";
+      return "<button class='inlineTooltip-button control' title='Close Menu' data-action='inline-menu'> <span class='tooltip-icon icon-plus'></span> </button> <div class='inlineTooltip-menu'> " + menu + " </div>";
     };
 
     Tooltip.prototype.insertTemplate = function() {
@@ -1661,17 +1658,28 @@
 
     Tooltip.prototype.render = function() {
       $(this.el).html(this.template());
-      return $(this.el).show();
+      $(this.el).addClass("is-active");
+      return this;
     };
 
     Tooltip.prototype.toggleOptions = function() {
       utils.log("Toggle Options!!");
-      $(this.el).toggleClass("is-active is-scaled");
+      $(this.el).toggleClass("is-scaled");
       return false;
     };
 
     Tooltip.prototype.move = function(coords) {
-      return $(this.el).offset(coords);
+      var control_spacing, control_width, coord_left, coord_top, pull_size, tooltip;
+      tooltip = $(this.el);
+      control_width = tooltip.find(".control").css("width");
+      control_spacing = tooltip.find(".inlineTooltip-menu").css("padding-left");
+      pull_size = parseInt(control_width.replace(/px/, "")) + parseInt(control_spacing.replace(/px/, ""));
+      coord_left = coords.left - pull_size;
+      coord_top = coords.top;
+      return $(this.el).offset({
+        top: coord_top,
+        left: coord_left
+      });
     };
 
     Tooltip.prototype.handleClick = function(ev) {
@@ -1995,7 +2003,6 @@
     };
 
     Tooltip.prototype.hide = function() {
-      $(this.el).hide();
       return $(this.el).removeClass("is-active is-scaled");
     };
 
