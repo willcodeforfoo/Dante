@@ -10881,7 +10881,7 @@ if ( typeof define === "function" ) {
     defaults: {
       image_placeholder: '../images/dante/media-loading-placeholder.png'
     },
-    version: "0.0.5"
+    version: "0.0.8"
   };
 
 }).call(this);
@@ -11307,6 +11307,8 @@ if ( typeof define === "function" ) {
       "drop": "handleDrag",
       "click .graf--figure .aspectRatioPlaceholder": "handleGrafFigureSelectImg",
       "click .graf--figure figcaption": "handleGrafFigureSelectCaption",
+      "mouseover .graf--figure.graf--iframe": "handleGrafFigureSelectIframe",
+      "mouseleave .graf--figure.graf--iframe": "handleGrafFigureUnSelectIframe",
       "keyup .graf--figure figcaption": "handleGrafCaptionTyping",
       "mouseover .markup--anchor": "displayPopOver",
       "mouseout  .markup--anchor": "hidePopOver"
@@ -11329,6 +11331,7 @@ if ( typeof define === "function" ) {
       this.spell_check = opts.spellcheck || false;
       this.disable_title = opts.disable_title || false;
       this.store_interval = opts.store_interval || 15000;
+      this.paste_element_id = "#dante-paste-div";
       window.debugMode = opts.debug || false;
       if (window.debugMode) {
         $(this.el).addClass("debug");
@@ -11578,11 +11581,13 @@ if ( typeof define === "function" ) {
       if (!node || node === root) {
         return null;
       }
-      while (node && (node.nodeType !== 1) && (node.parentNode !== root)) {
+      while (node && (node.nodeType !== 1 || !$(node).hasClass("graf")) && (node.parentNode !== root)) {
         node = node.parentNode;
       }
-      while (node && (node.parentNode !== root)) {
-        node = node.parentNode;
+      if (!$(node).hasClass("graf--li")) {
+        while (node && (node.parentNode !== root)) {
+          node = node.parentNode;
+        }
       }
       if (root && root.contains(node)) {
         return node;
@@ -11661,6 +11666,24 @@ if ( typeof define === "function" ) {
       this.markAsSelected(element);
       $(element).parent(".graf--figure").addClass("is-selected is-mediaFocused");
       return this.selection().removeAllRanges();
+    };
+
+    Editor.prototype.handleGrafFigureSelectIframe = function(ev) {
+      var element;
+      utils.log("FIGURE IFRAME SELECT");
+      element = ev.currentTarget;
+      this.iframeSelected = element;
+      this.markAsSelected(element);
+      $(element).addClass("is-selected is-mediaFocused");
+      return this.selection().removeAllRanges();
+    };
+
+    Editor.prototype.handleGrafFigureUnSelectIframe = function(ev) {
+      var element;
+      utils.log("FIGURE IFRAME UNSELECT");
+      element = ev.currentTarget;
+      this.iframeSelected = null;
+      return $(element).removeClass("is-selected is-mediaFocused");
     };
 
     Editor.prototype.handleGrafFigureSelectCaption = function(ev) {
@@ -11828,17 +11851,18 @@ if ( typeof define === "function" ) {
         cbd = ev.originalEvent.clipboardData;
         pastedText = _.isEmpty(cbd.getData('text/html')) ? cbd.getData('text/plain') : cbd.getData('text/html');
       }
-      utils.log(pastedText);
+      utils.log("Process and handle text...");
       if (pastedText.match(/<\/*[a-z][^>]+?>/gi)) {
         utils.log("HTML DETECTED ON PASTE");
-        $(pastedText);
-        document.body.appendChild($("<div id='paste'></div>")[0]);
-        $("#paste").html(pastedText);
-        this.setupElementsClasses($("#paste"), (function(_this) {
+        pastedText = pastedText.replace(/&.*;/g, "");
+        pastedText = pastedText.replace(/<div>([\w\W]*?)<\/div>/gi, '<p>$1</p>');
+        document.body.appendChild($("<div id='" + (this.paste_element_id.replace('#', '')) + "'></div>")[0]);
+        $(this.paste_element_id).html("<span>" + pastedText + "</span>");
+        this.setupElementsClasses($(this.paste_element_id), (function(_this) {
           return function() {
             var last_node, new_node, nodes, num, top;
-            nodes = $($("#paste").html()).insertAfter($(_this.aa));
-            $("#paste").remove();
+            nodes = $($(_this.paste_element_id).html()).insertAfter($(_this.aa));
+            $(_this.paste_element_id).remove();
             last_node = nodes.last()[0];
             num = last_node.childNodes.length;
             _this.setRangeAt(last_node, num);
@@ -11962,9 +11986,10 @@ if ( typeof define === "function" ) {
     };
 
     Editor.prototype.handleKeyDown = function(e) {
-      var anchor_node, parent, utils_anchor_node;
+      var $node, anchor_node, li, parent, utils_anchor_node;
       utils.log("KEYDOWN");
       anchor_node = this.getNode();
+      $node = $(anchor_node);
       if (anchor_node) {
         this.markAsSelected(anchor_node);
       }
@@ -11976,6 +12001,14 @@ if ( typeof define === "function" ) {
         $(this.el).find(".is-selected").removeClass("is-selected");
         parent = $(anchor_node);
         utils.log(this.isLastChar());
+        if ($node.hasClass("graf--p")) {
+          li = this.handleSmartList($node, e);
+          if (li) {
+            anchor_node = li;
+          }
+        } else if ($node.hasClass("graf--li") && ($node.text() === "")) {
+          this.handleListLineBreak($node, e);
+        }
         if (parent.hasClass("is-embedable")) {
           this.tooltip_view.getEmbedFromNode($(anchor_node));
         } else if (parent.hasClass("is-extractable")) {
@@ -12009,6 +12042,9 @@ if ( typeof define === "function" ) {
           return function() {
             var node;
             node = _this.getNode();
+            if (_.isUndefined(node)) {
+              return;
+            }
             _this.setElementName($(node));
             if (node.nodeName.toLowerCase() === "div") {
               node = _this.replaceWith("p", $(node))[0];
@@ -12037,6 +12073,9 @@ if ( typeof define === "function" ) {
         utils.log("pass initial validations");
         anchor_node = this.getNode();
         utils_anchor_node = utils.getNode();
+        if ($node.hasClass("graf--li") && this.getCharacterPrecedingCaret().length === 0) {
+          return this.handleListBackspace($node, e);
+        }
         if ($(utils_anchor_node).hasClass("section-content") || $(utils_anchor_node).hasClass("graf--first")) {
           utils.log("SECTION DETECTED FROM KEYDOWN " + (_.isEmpty($(utils_anchor_node).text())));
           if (_.isEmpty($(utils_anchor_node).text())) {
@@ -12047,17 +12086,13 @@ if ( typeof define === "function" ) {
           utils.log("TextNode detected from Down!");
         }
         if ($(anchor_node).hasClass("graf--mixtapeEmbed") || $(anchor_node).hasClass("graf--iframe")) {
-          if (_.isEmpty($(anchor_node).text().trim())) {
-            utils.log("EMPTY CHAR");
-            return false;
-          } else {
-            if (this.isFirstChar()) {
-              utils.log("FIRST CHAR");
-              if (this.isSelectingAll(anchor_node)) {
-                this.inmediateDeletion = true;
-              }
-              return false;
+          if (_.isEmpty($(anchor_node).text().trim() || this.isFirstChar())) {
+            utils.log("Check for inmediate deletion on empty embed text");
+            this.inmediateDeletion = this.isSelectingAll(anchor_node);
+            if (this.inmediateDeletion) {
+              this.handleInmediateDeletion($(anchor_node));
             }
+            return false;
           }
         }
         if ($(anchor_node).prev().hasClass("graf--mixtapeEmbed")) {
@@ -12065,11 +12100,16 @@ if ( typeof define === "function" ) {
             return false;
           }
         }
-        utils.log(anchor_node);
-        if ($(".is-selected").hasClass("graf--figure")) {
+        if ($(".is-selected").hasClass("graf--figure") && (anchor_node == null)) {
           this.replaceWith("p", $(".is-selected"));
           this.setRangeAt($(".is-selected")[0]);
           return false;
+        }
+      }
+      if (e.which === 32) {
+        utils.log("SPACEBAR");
+        if ($node.hasClass("graf--p")) {
+          this.handleSmartList($node, e);
         }
       }
       if (_.contains([38, 40], e.which)) {
@@ -12166,14 +12206,15 @@ if ( typeof define === "function" ) {
 
     Editor.prototype.displayTooltipAt = function(element) {
       utils.log("POSITION FOR TOOLTIP");
-      if (!element) {
+      element = $(element);
+      if (!element || _.isEmpty(element) || element[0].tagName === "LI") {
         return;
       }
       this.tooltip_view.hide();
-      if (!_.isEmpty($(element).text())) {
+      if (!_.isEmpty(element.text())) {
         return;
       }
-      this.positions = $(element).offset();
+      this.positions = element.offset();
       this.tooltip_view.render();
       return this.tooltip_view.move(this.positions);
     };
@@ -12228,9 +12269,10 @@ if ( typeof define === "function" ) {
           break;
         case "ol":
         case "ul":
+          utils.log("lists");
           $(n).removeClass().addClass("postList");
           _.each($(n).find("li"), function(li) {
-            return $(n).removeClass().addClass("graf graf--li");
+            return $(li).removeClass().addClass("graf graf--li");
           });
           break;
         case "img":
@@ -12296,7 +12338,7 @@ if ( typeof define === "function" ) {
         this.element = element;
       }
       s = new Sanitize({
-        elements: ['strong', 'img', 'em', 'br', 'a', 'blockquote', 'b', 'u', 'i', 'pre', 'p', 'h1', 'h2', 'h3', 'h4'],
+        elements: ['strong', 'img', 'em', 'br', 'a', 'blockquote', 'b', 'u', 'i', 'pre', 'p', 'h1', 'h2', 'h3', 'h4', 'ul', 'ol', 'li'],
         attributes: {
           '__ALL__': ['class'],
           a: ['href', 'title', 'target'],
@@ -12384,7 +12426,7 @@ if ( typeof define === "function" ) {
         ]
       });
       if (this.element.exists()) {
-        utils.log("CLEAN HTML");
+        utils.log("CLEAN HTML " + this.element[0].tagName);
         return this.element.html(s.clean_node(this.element[0]));
       }
     };
@@ -12408,7 +12450,7 @@ if ( typeof define === "function" ) {
     Editor.prototype.preCleanNode = function(element) {
       var s;
       s = new Sanitize({
-        elements: ['strong', 'em', 'br', 'a', 'b', 'u', 'i'],
+        elements: ['strong', 'em', 'br', 'a', 'b', 'u', 'i', 'ul', 'ol', 'li'],
         attributes: {
           a: ['href', 'title', 'target']
         },
@@ -12444,6 +12486,87 @@ if ( typeof define === "function" ) {
 
     Editor.prototype.setElementName = function(element) {
       return $(element).attr("name", utils.generateUniqueName());
+    };
+
+    Editor.prototype.listify = function($paragraph, listType, tagLength) {
+      var $li, $list, content;
+      utils.log("LISTIFY PARAGRAPH");
+      content = $paragraph.html().replace(/&nbsp;/g, " ");
+      utils.log(tagLength);
+      content = content.slice(tagLength, content.length);
+      switch (listType) {
+        case "ul":
+          $list = $("<ul></ul>");
+          break;
+        case "ol":
+          $list = $("<ol></ol>");
+          break;
+        default:
+          return false;
+      }
+      this.addClassesToElement($list[0]);
+      this.replaceWith("li", $paragraph);
+      $li = $(".is-selected");
+      this.setElementName($li[0]);
+      $li.html(content).wrap($list);
+      if ($li.find("br").length === 0) {
+        $li.append("<br/>");
+      }
+      this.setRangeAt($li[0]);
+      return $li[0];
+    };
+
+    Editor.prototype.handleSmartList = function($item, e) {
+      var $li, match;
+      utils.log("HANDLE A SMART LIST");
+      match = $item.text().match(/^\s*(\-|\*)\s*/);
+      if (match) {
+        utils.log("CREATING UL LIST ITEM");
+        e.preventDefault();
+        $li = this.listify($item, "ul", match[0].length);
+      } else if (match = $item.text().match(/^\s*1(\.|\))\s*/)) {
+        utils.log("CREATING OL LIST ITEM");
+        e.preventDefault();
+        $li = this.listify($item, "ol", match[0].length);
+      }
+      return $li;
+    };
+
+    Editor.prototype.handleListLineBreak = function($li, e) {
+      var $list, $paragraph;
+      utils.log("LIST LINE BREAK");
+      e.preventDefault();
+      this.tooltip_view.hide();
+      $list = $li.parent("ol, ul");
+      $paragraph = $("<p></p>");
+      if ($list.children().length === 1) {
+        return this.replaceWith("p", $list);
+      } else if ($li.next().length === 0 && $li.text() === "") {
+        $list.after($paragraph);
+        $li.remove();
+        this.addClassesToElement($paragraph[0]);
+        this.setRangeAt($paragraph[0]);
+        this.markAsSelected($paragraph[0]);
+        return this.scrollTo($paragraph);
+      }
+    };
+
+    Editor.prototype.handleListBackspace = function($li, e) {
+      var $list, $paragraph, content;
+      $list = $li.parent("ol, ul");
+      utils.log("LIST BACKSPACE");
+      if ($li.prev().length === 0) {
+        e.preventDefault();
+        $list.before($li);
+        content = $li.html();
+        this.replaceWith("p", $li);
+        $paragraph = $(".is-selected");
+        $paragraph.removeClass("graf--empty").html(content);
+        if ($list.children().length === 0) {
+          $list.remove();
+        }
+        return this.setupFirstAndLast();
+      }
     };
 
     return Editor;
@@ -12811,7 +12934,9 @@ if ( typeof define === "function" ) {
     };
 
     Tooltip.prototype.getEmbedFromNode = function(node) {
-      this.node_name = $(node).attr("name");
+      this.node = $(node);
+      this.node_name = this.node.attr("name");
+      this.node.addClass("spinner");
       return $.getJSON("" + this.current_editor.oembed_url + ($(this.node).text())).success((function(_this) {
         return function(data) {
           var iframe_src, replaced_node, tmpl, url;
@@ -12841,7 +12966,9 @@ if ( typeof define === "function" ) {
     };
 
     Tooltip.prototype.getExtractFromNode = function(node) {
-      this.node_name = $(node).attr("name");
+      this.node = $(node);
+      this.node_name = this.node.attr("name");
+      this.node.addClass("spinner");
       return $.getJSON("" + this.current_editor.extract_url + ($(this.node).text())).success((function(_this) {
         return function(data) {
           var iframe_src, image_node, replaced_node, tmpl;
@@ -13240,6 +13367,8 @@ if ( typeof define === "function" ) {
           }
           if (tag.match(/(?:h[1-6])/i)) {
             $(_this.el).find(".icon-bold, .icon-italic, .icon-blockquote").parent("li").remove();
+          } else if (tag === "indent") {
+            $(_this.el).find(".icon-h2, .icon-h3, .icon-h4, .icon-blockquote").parent("li").remove();
           }
           return _this.highlight(tag);
         };
