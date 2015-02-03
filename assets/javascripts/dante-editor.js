@@ -8,7 +8,7 @@
     defaults: {
       image_placeholder: '../images/dante/media-loading-placeholder.png'
     },
-    version: "0.0.8"
+    version: "0.0.9"
   };
 
 }).call(this);
@@ -1133,7 +1133,7 @@
           if (li) {
             anchor_node = li;
           }
-        } else if ($node.hasClass("graf--li") && ($node.text() === "")) {
+        } else if ($node.hasClass("graf--li")) {
           this.handleListLineBreak($node, e);
         }
         if (parent.hasClass("is-embedable")) {
@@ -1269,6 +1269,11 @@
       anchor_node = this.getNode();
       utils_anchor_node = utils.getNode();
       this.handleTextSelection(anchor_node);
+      if (_.contains([8, 32, 13], e.which)) {
+        if ($(anchor_node).hasClass("graf--li")) {
+          this.removeSpanTag($(anchor_node));
+        }
+      }
       if (e.which === 8) {
         if ($(utils_anchor_node).hasClass("postField--body")) {
           utils.log("ALL GONE from UP");
@@ -1615,12 +1620,11 @@
       return $(element).attr("name", utils.generateUniqueName());
     };
 
-    Editor.prototype.listify = function($paragraph, listType, tagLength) {
+    Editor.prototype.listify = function($paragraph, listType, regex) {
       var $li, $list, content;
       utils.log("LISTIFY PARAGRAPH");
-      content = $paragraph.html().replace(/&nbsp;/g, " ");
-      utils.log(tagLength);
-      content = content.slice(tagLength, content.length);
+      this.removeSpanTag($paragraph);
+      content = $paragraph.html().replace(/&nbsp;/g, " ").replace(regex, "");
       switch (listType) {
         case "ul":
           $list = $("<ul></ul>");
@@ -1644,33 +1648,60 @@
     };
 
     Editor.prototype.handleSmartList = function($item, e) {
-      var $li, match;
+      var $li, chars, match, regex;
       utils.log("HANDLE A SMART LIST");
-      match = $item.text().match(/^\s*(\-|\*)\s*/);
+      chars = this.getCharacterPrecedingCaret();
+      match = chars.match(/^\s*(\-|\*)\s*$/);
       if (match) {
-        utils.log("CREATING UL LIST ITEM");
+        utils.log("CREATING LIST ITEM");
         e.preventDefault();
-        $li = this.listify($item, "ul", match[0].length);
-      } else if (match = $item.text().match(/^\s*1(\.|\))\s*/)) {
-        utils.log("CREATING OL LIST ITEM");
-        e.preventDefault();
-        $li = this.listify($item, "ol", match[0].length);
+        regex = new RegExp(/\s*(\-|\*)\s*/);
+        $li = this.listify($item, "ul", regex);
+      } else {
+        match = chars.match(/^\s*1(\.|\))\s*$/);
+        if (match) {
+          utils.log("CREATING LIST ITEM");
+          e.preventDefault();
+          regex = new RegExp(/\s*1(\.|\))\s*/);
+          $li = this.listify($item, "ol", regex);
+        }
       }
       return $li;
     };
 
     Editor.prototype.handleListLineBreak = function($li, e) {
-      var $list, $paragraph;
+      var $list, $paragraph, content;
       utils.log("LIST LINE BREAK");
-      e.preventDefault();
       this.tooltip_view.hide();
       $list = $li.parent("ol, ul");
       $paragraph = $("<p></p>");
-      if ($list.children().length === 1) {
-        return this.replaceWith("p", $list);
-      } else if ($li.next().length === 0 && $li.text() === "") {
-        $list.after($paragraph);
-        $li.remove();
+      utils.log($li.prev());
+      if ($list.children().length === 1 && $li.text() === "") {
+        this.replaceWith("p", $list);
+      } else if ($li.text() === "" && ($li.next().length !== 0)) {
+        e.preventDefault();
+      } else if ($li.next().length === 0) {
+        if ($li.text() === "") {
+          e.preventDefault();
+          utils.log("BREAK FROM LIST");
+          $list.after($paragraph);
+          $li.addClass("graf--removed").remove();
+        } else if ($li.prev().length !== 0 && $li.prev().text() === "" && this.getCharacterPrecedingCaret() === "") {
+          e.preventDefault();
+          utils.log("PREV IS EMPTY");
+          content = $li.html();
+          $list.after($paragraph);
+          $li.prev().remove();
+          $li.addClass("graf--removed").remove();
+          $paragraph.html(content);
+        }
+      }
+      if ($list && $list.children().length === 0) {
+        $list.remove();
+      }
+      utils.log($li);
+      if ($li.hasClass("graf--removed")) {
+        utils.log("ELEMENT REMOVED");
         this.addClassesToElement($paragraph[0]);
         this.setRangeAt($paragraph[0]);
         this.markAsSelected($paragraph[0]);
@@ -1694,6 +1725,18 @@
         }
         return this.setupFirstAndLast();
       }
+    };
+
+    Editor.prototype.removeSpanTag = function($item) {
+      var $spans, span, _i, _len;
+      $spans = $item.find("span");
+      for (_i = 0, _len = $spans.length; _i < _len; _i++) {
+        span = $spans[_i];
+        if (!$(span).hasClass("defaultValue")) {
+          $(span).replaceWith($(span).html());
+        }
+      }
+      return $item;
     };
 
     return Editor;
