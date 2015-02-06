@@ -8,7 +8,7 @@
     defaults: {
       image_placeholder: '../images/dante/media-loading-placeholder.png'
     },
-    version: "0.0.9"
+    version: "0.0.10"
   };
 
 }).call(this);
@@ -442,6 +442,7 @@
     };
 
     Editor.prototype.initialize = function(opts) {
+      var bodyplaceholder, embedplaceholder, extractplaceholder, titleplaceholder;
       if (opts == null) {
         opts = {};
       }
@@ -451,6 +452,7 @@
       this.current_node = null;
       this.el = opts.el || "#editor";
       this.upload_url = opts.upload_url || "/uploads.json";
+      this.upload_callback = opts.upload_callback;
       this.oembed_url = opts.oembed_url || "http://api.embed.ly/1/oembed?url=";
       this.extract_url = opts.extract_url || "http://api.embed.ly/1/extract?key=86c28a410a104c8bb58848733c82f840&url=";
       this.default_loading_placeholder = opts.default_loading_placeholder || Dante.defaults.image_placeholder;
@@ -467,10 +469,14 @@
         $(this.el).html(localStorage.getItem('contenteditable'));
       }
       this.store();
-      this.title_placeholder = "<span class='defaultValue defaultValue--root'>Title</span><br>";
-      this.body_placeholder = "<span class='defaultValue defaultValue--root'>Tell your story…</span><br>";
-      this.embed_placeholder = "<span class='defaultValue defaultValue--prompt'>Paste a YouTube, Vine, Vimeo, or other video link, and press Enter</span><br>";
-      return this.extract_placeholder = "<span class='defaultValue defaultValue--prompt'>Paste a link to embed content from another site (e.g. Twitter) and press Enter</span><br>";
+      titleplaceholder = opts.title_placeholder || 'Title';
+      this.title_placeholder = "<span class='defaultValue defaultValue--root'>" + titleplaceholder + "</span><br>";
+      bodyplaceholder = opts.body_placeholder || 'Tell your story…';
+      this.body_placeholder = "<span class='defaultValue defaultValue--root'>" + bodyplaceholder + "</span><br>";
+      embedplaceholder = opts.embed_placeholder || 'Paste a YouTube, Vine, Vimeo, or other video link, and press Enter';
+      this.embed_placeholder = "<span class='defaultValue defaultValue--root'>" + embedplaceholder + "</span><br>";
+      extractplaceholder = opts.extract_placeholder || "Paste a link to embed content from another site (e.g. Twitter) and press Enter";
+      return this.extract_placeholder = "<span class='defaultValue defaultValue--root'>" + extractplaceholder + "</span><br>";
     };
 
     Editor.prototype.store = function() {
@@ -1339,7 +1345,7 @@
     Editor.prototype.displayTooltipAt = function(element) {
       utils.log("POSITION FOR TOOLTIP");
       element = $(element);
-      if (!element || _.isEmpty(element) || element[0].tagName === "LI") {
+      if (!element || _.isUndefined(element) || _.isEmpty(element) || element[0].tagName === "LI") {
         return;
       }
       this.tooltip_view.hide();
@@ -2062,6 +2068,9 @@
         contentType: false,
         success: (function(_this) {
           return function(response) {
+            if (_this.current_editor.upload_callback) {
+              response = _this.current_editor.upload_callback(response);
+            }
             handleUp(response);
           };
         })(this),
