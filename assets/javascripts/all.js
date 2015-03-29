@@ -10881,7 +10881,7 @@ if ( typeof define === "function" ) {
     defaults: {
       image_placeholder: '../images/dante/media-loading-placeholder.png'
     },
-    version: "0.0.10"
+    version: "0.0.11"
   };
 
 }).call(this);
@@ -11190,6 +11190,8 @@ if ( typeof define === "function" ) {
 
 }).call(this);
 (function() {
+  var extend;
+
   Dante.View = (function() {
     function View(opts) {
       if (opts == null) {
@@ -11267,6 +11269,32 @@ if ( typeof define === "function" ) {
 
   })();
 
+  extend = function(protoProps, staticProps) {
+    var Surrogate, child, parent;
+    parent = this;
+    child = void 0;
+    if (protoProps && _.has(protoProps, 'constructor')) {
+      child = protoProps.constructor;
+    } else {
+      child = function() {
+        return parent.apply(this, arguments);
+      };
+    }
+    _.extend(child, parent, staticProps);
+    Surrogate = function() {
+      this.constructor = child;
+    };
+    Surrogate.prototype = parent.prototype;
+    child.prototype = new Surrogate;
+    if (protoProps) {
+      _.extend(child.prototype, protoProps);
+    }
+    child.__super__ = parent.prototype;
+    return child;
+  };
+
+  Dante.View.extend = extend;
+
 }).call(this);
 (function() {
   var utils,
@@ -11334,6 +11362,9 @@ if ( typeof define === "function" ) {
       this.disable_title = opts.disable_title || false;
       this.store_interval = opts.store_interval || 15000;
       this.paste_element_id = "#dante-paste-div";
+      this.tooltip_class = opts.tooltip_class || Dante.Editor.Tooltip;
+      opts.base_widgets || (opts.base_widgets = ["uploader", "embed", "embed_extract"]);
+      this.widgets = [];
       window.debugMode = opts.debug || false;
       if (window.debugMode) {
         $(this.el).addClass("debug");
@@ -11349,7 +11380,38 @@ if ( typeof define === "function" ) {
       embedplaceholder = opts.embed_placeholder || 'Paste a YouTube, Vine, Vimeo, or other video link, and press Enter';
       this.embed_placeholder = "<span class='defaultValue defaultValue--root'>" + embedplaceholder + "</span><br>";
       extractplaceholder = opts.extract_placeholder || "Paste a link to embed content from another site (e.g. Twitter) and press Enter";
-      return this.extract_placeholder = "<span class='defaultValue defaultValue--root'>" + extractplaceholder + "</span><br>";
+      this.extract_placeholder = "<span class='defaultValue defaultValue--root'>" + extractplaceholder + "</span><br>";
+      return this.initializeWidgets(opts);
+    };
+
+    Editor.prototype.initializeWidgets = function(opts) {
+      var base_widgets;
+      base_widgets = opts.base_widgets;
+      if (base_widgets.indexOf("uploader") >= 0) {
+        this.uploader_widget = new Dante.View.TooltipWidget.Uploader({
+          current_editor: this
+        });
+        this.widgets.push(this.uploader_widget);
+      }
+      if (base_widgets.indexOf("embed") >= 0) {
+        this.embed_widget = new Dante.View.TooltipWidget.Embed({
+          current_editor: this
+        });
+        this.widgets.push(this.embed_widget);
+      }
+      if (base_widgets.indexOf("embed_extract") >= 0) {
+        this.embed_extract_widget = new Dante.View.TooltipWidget.EmbedExtract({
+          current_editor: this
+        });
+        this.widgets.push(this.embed_extract_widget);
+      }
+      if (opts.extra_tooltip_widgets) {
+        return _.each(opts.extra_tooltip_widgets, (function(_this) {
+          return function(w) {
+            return _this.widgets.push(w);
+          };
+        })(this));
+      }
     };
 
     Editor.prototype.store = function() {
@@ -11409,8 +11471,9 @@ if ( typeof define === "function" ) {
       this.editor_menu = new Dante.Editor.Menu({
         editor: this
       });
-      this.tooltip_view = new Dante.Editor.Tooltip({
-        editor: this
+      this.tooltip_view = new this.tooltip_class({
+        editor: this,
+        widgets: this.widgets
       });
       this.pop_over = new Dante.Editor.PopOver({
         editor: this
@@ -11890,7 +11953,7 @@ if ( typeof define === "function" ) {
       return _.each(elements.find("img"), (function(_this) {
         return function(image) {
           utils.log("process image here!");
-          return _this.tooltip_view.uploadExistentImage(image);
+          return _this.uploader_widget.uploadExistentImage(image);
         };
       })(this));
     };
@@ -11992,10 +12055,10 @@ if ( typeof define === "function" ) {
     };
 
     Editor.prototype.handleKeyDown = function(e) {
-      var $node, anchor_node, li, parent, utils_anchor_node;
+      var anchor_node, li, parent, utils_anchor_node;
       utils.log("KEYDOWN");
       anchor_node = this.getNode();
-      $node = $(anchor_node);
+      parent = $(anchor_node);
       if (anchor_node) {
         this.markAsSelected(anchor_node);
       }
@@ -12005,21 +12068,23 @@ if ( typeof define === "function" ) {
       }
       if (e.which === 13) {
         $(this.el).find(".is-selected").removeClass("is-selected");
-        parent = $(anchor_node);
         utils.log(this.isLastChar());
-        if ($node.hasClass("graf--p")) {
-          li = this.handleSmartList($node, e);
+        if (parent.hasClass("graf--p")) {
+          li = this.handleSmartList(parent, e);
           if (li) {
             anchor_node = li;
           }
-        } else if ($node.hasClass("graf--li")) {
-          this.handleListLineBreak($node, e);
+        } else if (parent.hasClass("graf--li")) {
+          this.handleListLineBreak(parent, e);
         }
-        if (parent.hasClass("is-embedable")) {
-          this.tooltip_view.getEmbedFromNode($(anchor_node));
-        } else if (parent.hasClass("is-extractable")) {
-          this.tooltip_view.getExtractFromNode($(anchor_node));
-        }
+        utils.log("HANDLING WIDGET KEYDOWNS");
+        _.each(this.widgets, (function(_this) {
+          return function(w) {
+            if (w.handleEnterKey) {
+              return w.handleEnterKey(e, parent);
+            }
+          };
+        })(this));
         if (parent.hasClass("graf--mixtapeEmbed") || parent.hasClass("graf--iframe") || parent.hasClass("graf--figure")) {
           utils.log("supress linebreak from embed !(last char)");
           if (!this.isLastChar()) {
@@ -12079,8 +12144,8 @@ if ( typeof define === "function" ) {
         utils.log("pass initial validations");
         anchor_node = this.getNode();
         utils_anchor_node = utils.getNode();
-        if ($node.hasClass("graf--li") && this.getCharacterPrecedingCaret().length === 0) {
-          return this.handleListBackspace($node, e);
+        if (parent.hasClass("graf--li") && this.getCharacterPrecedingCaret().length === 0) {
+          return this.handleListBackspace(parent, e);
         }
         if ($(utils_anchor_node).hasClass("section-content") || $(utils_anchor_node).hasClass("graf--first")) {
           utils.log("SECTION DETECTED FROM KEYDOWN " + (_.isEmpty($(utils_anchor_node).text())));
@@ -12114,8 +12179,8 @@ if ( typeof define === "function" ) {
       }
       if (e.which === 32) {
         utils.log("SPACEBAR");
-        if ($node.hasClass("graf--p")) {
-          this.handleSmartList($node, e);
+        if (parent.hasClass("graf--p")) {
+          this.handleSmartList(parent, e);
         }
       }
       if (_.contains([38, 40], e.which)) {
@@ -12288,7 +12353,7 @@ if ( typeof define === "function" ) {
           break;
         case "img":
           utils.log("images");
-          this.tooltip_view.uploadExistentImage(n);
+          this.uploader_widget.uploadExistentImage(n);
           break;
         case "a":
         case 'strong':
@@ -12624,6 +12689,37 @@ if ( typeof define === "function" ) {
 
 }).call(this);
 (function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  Dante.View.TooltipWidget = (function(_super) {
+    __extends(TooltipWidget, _super);
+
+    function TooltipWidget() {
+      this.hide = __bind(this.hide, this);
+      return TooltipWidget.__super__.constructor.apply(this, arguments);
+    }
+
+    TooltipWidget.prototype.initialize = function(opts) {
+      if (opts == null) {
+        opts = {};
+      }
+      this.icon = opts.icon;
+      this.title = opts.title;
+      return this.actionEvent = opts.title;
+    };
+
+    TooltipWidget.prototype.hide = function() {
+      return this.current_editor.tooltip_view.hide();
+    };
+
+    return TooltipWidget;
+
+  })(Dante.View);
+
+}).call(this);
+(function() {
   var utils,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
@@ -12631,124 +12727,36 @@ if ( typeof define === "function" ) {
 
   utils = Dante.utils;
 
-  Dante.Editor.Tooltip = (function(_super) {
-    __extends(Tooltip, _super);
+  Dante.View.TooltipWidget.Uploader = (function(_super) {
+    __extends(Uploader, _super);
 
-    function Tooltip() {
-      this.hide = __bind(this.hide, this);
-      this.getExtract = __bind(this.getExtract, this);
-      this.getExtractFromNode = __bind(this.getExtractFromNode, this);
-      this.getEmbedFromNode = __bind(this.getEmbedFromNode, this);
+    function Uploader() {
       this.uploadCompleted = __bind(this.uploadCompleted, this);
       this.updateProgressBar = __bind(this.updateProgressBar, this);
       this.uploadFile = __bind(this.uploadFile, this);
       this.uploadFiles = __bind(this.uploadFiles, this);
-      this.toggleOptions = __bind(this.toggleOptions, this);
-      this.render = __bind(this.render, this);
-      this.initialize = __bind(this.initialize, this);
-      return Tooltip.__super__.constructor.apply(this, arguments);
+      return Uploader.__super__.constructor.apply(this, arguments);
     }
 
-    Tooltip.prototype.el = ".inlineTooltip";
-
-    Tooltip.prototype.events = {
-      "click .inlineTooltip-button.control": "toggleOptions",
-      "click .inlineTooltip-menu button": "handleClick"
-    };
-
-    Tooltip.prototype.initialize = function(opts) {
+    Uploader.prototype.initialize = function(opts) {
       if (opts == null) {
         opts = {};
       }
-      this.current_editor = opts.editor;
-      return this.buttons = [
-        {
-          icon: "icon-image",
-          title: "Add an image",
-          action: "image"
-        }, {
-          icon: "icon-video",
-          title: "Add a video",
-          action: "embed"
-        }, {
-          icon: "icon-embed",
-          title: "Add an embed",
-          action: "embed-extract"
-        }
-      ];
+      this.icon = opts.icon || "icon-image";
+      this.title = opts.title || "Add an image";
+      this.action = opts.action || "menu-image";
+      return this.current_editor = opts.current_editor;
     };
 
-    Tooltip.prototype.template = function() {
-      var menu;
-      menu = "";
-      _.each(this.buttons, function(b) {
-        var data_action_value;
-        data_action_value = b.action_value ? "data-action-value='" + b.action_value + "'" : "";
-        return menu += "<button class='inlineTooltip-button scale' title='" + b.title + "' data-action='inline-menu-" + b.action + "' " + data_action_value + "> <span class='tooltip-icon " + b.icon + "'></span> </button>";
-      });
-      return "<button class='inlineTooltip-button control' title='Close Menu' data-action='inline-menu'> <span class='tooltip-icon icon-plus'></span> </button> <div class='inlineTooltip-menu'> " + menu + " </div>";
+    Uploader.prototype.handleClick = function(ev) {
+      return this.imageSelect(ev);
     };
 
-    Tooltip.prototype.insertTemplate = function() {
+    Uploader.prototype.insertTemplate = function() {
       return "<figure contenteditable='false' class='graf graf--figure is-defaultValue' name='" + (utils.generateUniqueName()) + "' tabindex='0'> <div style='' class='aspectRatioPlaceholder is-locked'> <div style='padding-bottom: 100%;' class='aspect-ratio-fill'></div> <img src='' data-height='' data-width='' data-image-id='' class='graf-image' data-delayed-src=''> </div> <figcaption contenteditable='true' data-default-value='Type caption for image (optional)' class='imageCaption'> <span class='defaultValue'>Type caption for image (optional)</span> <br> </figcaption> </figure>";
     };
 
-    Tooltip.prototype.extractTemplate = function() {
-      return "<div class='graf graf--mixtapeEmbed is-selected' name=''> <a target='_blank' data-media-id='' class='js-mixtapeImage mixtapeImage mixtapeImage--empty u-ignoreBlock' href=''> </a> <a data-tooltip-type='link' data-tooltip-position='bottom' data-tooltip='' title='' class='markup--anchor markup--mixtapeEmbed-anchor' data-href='' href='' target='_blank'> <strong class='markup--strong markup--mixtapeEmbed-strong'></strong> <em class='markup--em markup--mixtapeEmbed-em'></em> </a> </div>";
-    };
-
-    Tooltip.prototype.embedTemplate = function() {
-      return "<figure contenteditable='false' class='graf--figure graf--iframe graf--first' name='504e' tabindex='0'> <div class='iframeContainer'> <iframe frameborder='0' width='700' height='393' data-media-id='' src='' data-height='480' data-width='854'> </iframe> </div> <figcaption contenteditable='true' data-default-value='Type caption for embed (optional)' class='imageCaption'> <a rel='nofollow' class='markup--anchor markup--figure-anchor' data-href='' href='' target='_blank'> </a> </figcaption> </figure>";
-    };
-
-    Tooltip.prototype.render = function() {
-      $(this.el).html(this.template());
-      $(this.el).addClass("is-active");
-      return this;
-    };
-
-    Tooltip.prototype.toggleOptions = function() {
-      utils.log("Toggle Options!!");
-      $(this.el).toggleClass("is-scaled");
-      return false;
-    };
-
-    Tooltip.prototype.move = function(coords) {
-      var control_spacing, control_width, coord_left, coord_top, pull_size, tooltip;
-      tooltip = $(this.el);
-      control_width = tooltip.find(".control").css("width");
-      control_spacing = tooltip.find(".inlineTooltip-menu").css("padding-left");
-      pull_size = parseInt(control_width.replace(/px/, "")) + parseInt(control_spacing.replace(/px/, ""));
-      coord_left = coords.left - pull_size;
-      coord_top = coords.top;
-      return $(this.el).offset({
-        top: coord_top,
-        left: coord_left
-      });
-    };
-
-    Tooltip.prototype.handleClick = function(ev) {
-      var name;
-      name = $(ev.currentTarget).data('action');
-      utils.log(name);
-      switch (name) {
-        case "inline-menu-image":
-          this.placeholder = "<p>PLACEHOLDER</p>";
-          this.imageSelect(ev);
-          break;
-        case "inline-menu-embed":
-          this.displayEmbedPlaceHolder();
-          break;
-        case "inline-menu-embed-extract":
-          this.displayExtractPlaceHolder();
-          break;
-        case "inline-menu-hr":
-          this.splitSection();
-      }
-      return false;
-    };
-
-    Tooltip.prototype.uploadExistentImage = function(image_element, opts) {
+    Uploader.prototype.uploadExistentImage = function(image_element, opts) {
       var i, img, n, node, tmpl, _i, _ref;
       if (opts == null) {
         opts = {};
@@ -12783,7 +12791,7 @@ if ( typeof define === "function" ) {
       return utils.log("FIG");
     };
 
-    Tooltip.prototype.replaceImg = function(image_element, figure) {
+    Uploader.prototype.replaceImg = function(image_element, figure) {
       var img, self;
       utils.log(figure.attr("name"));
       utils.log(figure);
@@ -12812,11 +12820,11 @@ if ( typeof define === "function" ) {
       };
     };
 
-    Tooltip.prototype.displayAndUploadImages = function(file) {
+    Uploader.prototype.displayAndUploadImages = function(file) {
       return this.displayCachedImage(file);
     };
 
-    Tooltip.prototype.imageSelect = function(ev) {
+    Uploader.prototype.imageSelect = function(ev) {
       var $selectFile, self;
       $selectFile = $('<input type="file" multiple="multiple">').click();
       self = this;
@@ -12827,7 +12835,7 @@ if ( typeof define === "function" ) {
       });
     };
 
-    Tooltip.prototype.displayCachedImage = function(file) {
+    Uploader.prototype.displayCachedImage = function(file) {
       var reader;
       this.current_editor.tooltip_view.hide();
       reader = new FileReader();
@@ -12865,7 +12873,7 @@ if ( typeof define === "function" ) {
       return reader.readAsDataURL(file);
     };
 
-    Tooltip.prototype.getAspectRatio = function(w, h) {
+    Uploader.prototype.getAspectRatio = function(w, h) {
       var fill_ratio, height, maxHeight, maxWidth, ratio, result, width;
       maxWidth = 700;
       maxHeight = 700;
@@ -12891,14 +12899,14 @@ if ( typeof define === "function" ) {
       return result;
     };
 
-    Tooltip.prototype.formatData = function(file) {
+    Uploader.prototype.formatData = function(file) {
       var formData;
       formData = new FormData();
       formData.append('file', file);
       return formData;
     };
 
-    Tooltip.prototype.uploadFiles = function(files) {
+    Uploader.prototype.uploadFiles = function(files) {
       var acceptedTypes, file, i, _results;
       acceptedTypes = {
         "image/png": true,
@@ -12918,7 +12926,7 @@ if ( typeof define === "function" ) {
       return _results;
     };
 
-    Tooltip.prototype.uploadFile = function(file, node) {
+    Uploader.prototype.uploadFile = function(file, node) {
       var handleUp, n;
       n = node;
       handleUp = (function(_this) {
@@ -12957,7 +12965,7 @@ if ( typeof define === "function" ) {
       });
     };
 
-    Tooltip.prototype.updateProgressBar = function(e) {
+    Uploader.prototype.updateProgressBar = function(e) {
       var $progress, complete;
       $progress = $('.progress:first', this.$el);
       complete = "";
@@ -12971,11 +12979,56 @@ if ( typeof define === "function" ) {
       }
     };
 
-    Tooltip.prototype.uploadCompleted = function(url, node) {
+    Uploader.prototype.uploadCompleted = function(url, node) {
       return node.find("img").attr("src", url);
     };
 
-    Tooltip.prototype.displayEmbedPlaceHolder = function() {
+    return Uploader;
+
+  })(Dante.View.TooltipWidget);
+
+}).call(this);
+(function() {
+  var utils,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  utils = Dante.utils;
+
+  Dante.View.TooltipWidget.Embed = (function(_super) {
+    __extends(Embed, _super);
+
+    function Embed() {
+      this.getEmbedFromNode = __bind(this.getEmbedFromNode, this);
+      return Embed.__super__.constructor.apply(this, arguments);
+    }
+
+    Embed.prototype.initialize = function(opts) {
+      if (opts == null) {
+        opts = {};
+      }
+      this.icon = opts.icon || "icon-video";
+      this.title = opts.title || "Add a video";
+      this.action = opts.action || "embed";
+      return this.current_editor = opts.current_editor;
+    };
+
+    Embed.prototype.handleClick = function(ev) {
+      return this.displayEmbedPlaceHolder(ev);
+    };
+
+    Embed.prototype.handleEnterKey = function(ev, $node) {
+      if ($node.hasClass("is-embedable")) {
+        return this.getEmbedFromNode($node);
+      }
+    };
+
+    Embed.prototype.embedTemplate = function() {
+      return "<figure contenteditable='false' class='graf--figure graf--iframe graf--first' name='504e' tabindex='0'> <div class='iframeContainer'> <iframe frameborder='0' width='700' height='393' data-media-id='' src='' data-height='480' data-width='854'> </iframe> </div> <figcaption contenteditable='true' data-default-value='Type caption for embed (optional)' class='imageCaption'> <a rel='nofollow' class='markup--anchor markup--figure-anchor' data-href='' href='' target='_blank'> </a> </figcaption> </figure>";
+    };
+
+    Embed.prototype.displayEmbedPlaceHolder = function() {
       var ph;
       ph = this.current_editor.embed_placeholder;
       this.node = this.current_editor.getNode();
@@ -12985,7 +13038,7 @@ if ( typeof define === "function" ) {
       return false;
     };
 
-    Tooltip.prototype.getEmbedFromNode = function(node) {
+    Embed.prototype.getEmbedFromNode = function(node) {
       this.node = $(node);
       this.node_name = this.node.attr("name");
       this.node.addClass("spinner");
@@ -13004,10 +13057,60 @@ if ( typeof define === "function" ) {
           replaced_node.find(".markup--anchor").attr("href", url).text(url);
           return _this.hide();
         };
+      })(this)).error((function(_this) {
+        return function(res) {
+          return _this.node.removeClass("spinner");
+        };
       })(this));
     };
 
-    Tooltip.prototype.displayExtractPlaceHolder = function() {
+    return Embed;
+
+  })(Dante.View.TooltipWidget);
+
+}).call(this);
+(function() {
+  var utils,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  utils = Dante.utils;
+
+  Dante.View.TooltipWidget.EmbedExtract = (function(_super) {
+    __extends(EmbedExtract, _super);
+
+    function EmbedExtract() {
+      this.getExtract = __bind(this.getExtract, this);
+      this.getExtractFromNode = __bind(this.getExtractFromNode, this);
+      return EmbedExtract.__super__.constructor.apply(this, arguments);
+    }
+
+    EmbedExtract.prototype.initialize = function(opts) {
+      if (opts == null) {
+        opts = {};
+      }
+      this.icon = opts.icon || "icon-embed";
+      this.title = opts.title || "Add an embed";
+      this.action = opts.action || "embed-extract";
+      return this.current_editor = opts.current_editor;
+    };
+
+    EmbedExtract.prototype.handleClick = function(ev) {
+      return this.displayExtractPlaceHolder(ev);
+    };
+
+    EmbedExtract.prototype.handleEnterKey = function(ev, $node) {
+      if ($node.hasClass("is-extractable")) {
+        return this.getExtractFromNode($node);
+      }
+    };
+
+    EmbedExtract.prototype.extractTemplate = function() {
+      return "<div class='graf graf--mixtapeEmbed is-selected' name=''> <a target='_blank' data-media-id='' class='js-mixtapeImage mixtapeImage mixtapeImage--empty u-ignoreBlock' href=''> </a> <a data-tooltip-type='link' data-tooltip-position='bottom' data-tooltip='' title='' class='markup--anchor markup--mixtapeEmbed-anchor' data-href='' href='' target='_blank'> <strong class='markup--strong markup--mixtapeEmbed-strong'></strong> <em class='markup--em markup--mixtapeEmbed-em'></em> </a> </div>";
+    };
+
+    EmbedExtract.prototype.displayExtractPlaceHolder = function() {
       var ph;
       ph = this.current_editor.extract_placeholder;
       this.node = this.current_editor.getNode();
@@ -13017,7 +13120,7 @@ if ( typeof define === "function" ) {
       return false;
     };
 
-    Tooltip.prototype.getExtractFromNode = function(node) {
+    EmbedExtract.prototype.getExtractFromNode = function(node) {
       this.node = $(node);
       this.node_name = this.node.attr("name");
       this.node.addClass("spinner");
@@ -13041,13 +13144,123 @@ if ( typeof define === "function" ) {
           }
           return _this.hide();
         };
+      })(this)).error((function(_this) {
+        return function(data) {
+          return _this.node.removeClass("spinner");
+        };
       })(this));
     };
 
-    Tooltip.prototype.getExtract = function(url) {
+    EmbedExtract.prototype.getExtract = function(url) {
       return $.getJSON("" + this.current_editor.extract_url + url).done(function(data) {
         return utils.log(data);
       });
+    };
+
+    return EmbedExtract;
+
+  })(Dante.View.TooltipWidget);
+
+}).call(this);
+(function() {
+  var utils,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  utils = Dante.utils;
+
+  Dante.Editor.Tooltip = (function(_super) {
+    __extends(Tooltip, _super);
+
+    function Tooltip() {
+      this.hide = __bind(this.hide, this);
+      this.toggleOptions = __bind(this.toggleOptions, this);
+      this.render = __bind(this.render, this);
+      this.initialize = __bind(this.initialize, this);
+      return Tooltip.__super__.constructor.apply(this, arguments);
+    }
+
+    Tooltip.prototype.el = ".inlineTooltip";
+
+    Tooltip.prototype.events = {
+      "click .inlineTooltip-button.control": "toggleOptions",
+      "click .inlineTooltip-menu button": "handleClick"
+    };
+
+    Tooltip.prototype.initialize = function(opts) {
+      if (opts == null) {
+        opts = {};
+      }
+      this.current_editor = opts.editor;
+      return this.widgets = opts.widgets;
+    };
+
+    Tooltip.prototype.template = function() {
+      var menu;
+      menu = "";
+      _.each(this.widgets, function(b) {
+        var data_action_value;
+        data_action_value = b.action_value ? "data-action-value='" + b.action_value + "'" : "";
+        return menu += "<button class='inlineTooltip-button scale' title='" + b.title + "' data-action='inline-menu-" + b.action + "' " + data_action_value + "> <span class='tooltip-icon " + b.icon + "'></span> </button>";
+      });
+      return "<button class='inlineTooltip-button control' title='Close Menu' data-action='inline-menu'> <span class='tooltip-icon icon-plus'></span> </button> <div class='inlineTooltip-menu'> " + menu + " </div>";
+    };
+
+    Tooltip.prototype.findWidgetByAction = function(name) {
+      return _.find(this.widgets, function(e) {
+        return e.action === name;
+      });
+    };
+
+    Tooltip.prototype.render = function() {
+      $(this.el).html(this.template());
+      $(this.el).addClass("is-active");
+      return this;
+    };
+
+    Tooltip.prototype.toggleOptions = function() {
+      utils.log("Toggle Options!!");
+      $(this.el).toggleClass("is-scaled");
+      return false;
+    };
+
+    Tooltip.prototype.move = function(coords) {
+      var control_spacing, control_width, coord_left, coord_top, pull_size, tooltip;
+      tooltip = $(this.el);
+      control_width = tooltip.find(".control").css("width");
+      control_spacing = tooltip.find(".inlineTooltip-menu").css("padding-left");
+      pull_size = parseInt(control_width.replace(/px/, "")) + parseInt(control_spacing.replace(/px/, ""));
+      coord_left = coords.left - pull_size;
+      coord_top = coords.top;
+      return $(this.el).offset({
+        top: coord_top,
+        left: coord_left
+      });
+    };
+
+    Tooltip.prototype.handleClick = function(ev) {
+      var detected_widget, name, sub_name;
+      name = $(ev.currentTarget).data('action');
+      utils.log(name);
+
+      /*
+      switch name
+        when "inline-menu-image"
+          @placeholder = "<p>PLACEHOLDER</p>"
+          @imageSelect(ev)
+        when "inline-menu-embed"
+          @displayEmbedPlaceHolder()
+        when "inline-menu-embed-extract"
+          @displayExtractPlaceHolder()
+        when "inline-menu-hr"
+          @splitSection()
+       */
+      sub_name = name.replace("inline-menu-", "");
+      if (detected_widget = this.findWidgetByAction(sub_name)) {
+        detected_widget.handleClick(ev);
+      }
+      return false;
     };
 
     Tooltip.prototype.cleanOperationClasses = function(node) {
@@ -13447,6 +13660,10 @@ if ( typeof define === "function" ) {
 
 }).call(this);
 //Editor components
+
+
+
+
 
 
 
