@@ -104,6 +104,7 @@ class Dante.Editor extends Dante.View
       $.ajax
         url: @store_url
         method: "post"
+        contentType: "text/plain"
         data: @getContent()
         success: (res)->
           utils.log "store!"
