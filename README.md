@@ -1,10 +1,10 @@
-#Dante Editor
+# Dante Editor
 
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/michelson/Dante?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-####Just another Medium editor clone.
+#### Just another Medium editor clone.
 
-##Motivation:
+## Motivation:
 
 So far I have tried all the Medium.com wysiwyg clones out there, these are really great, and each have their pros and cons. [But none of them has all the features that the real medium editor provides.](http://howtox.com/medium-editor-clones-in-js/)
 so I wonder, How complicated could be write my own Medium wysiwyg clone?
